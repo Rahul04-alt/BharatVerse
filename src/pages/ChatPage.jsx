@@ -159,6 +159,7 @@ const ChatPage = ({ user, onPageChange, updateProgress }) => {
     } catch (error) {
       console.error("Chat error:", error);
 
+      // sendAgentMessage never throws — this is a truly unexpected error
       const botResponse = generateFallbackResponse(messageText);
 
       const botMessage = {
@@ -170,7 +171,10 @@ const ChatPage = ({ user, onPageChange, updateProgress }) => {
       };
 
       setMessages((prev) => [...prev, botMessage]);
-      toast.error("Using offline mode - limited responses");
+      toast("Switched to offline cultural archive", {
+        icon: "📚",
+        style: { background: "#1e293b", color: "#f8fafc", border: "1px solid #334155" },
+      });
     } finally {
       setIsLoading(false);
       setActiveToolStatus("");
