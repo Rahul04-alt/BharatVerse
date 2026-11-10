@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Menu, X, User, Heart, Crown, MapPin } from "lucide-react";
+import { Search, Menu, X, User, Heart, Crown, MapPin, LogOut } from "lucide-react";
 
 const Header = ({
   currentPage,
@@ -131,6 +131,16 @@ const Header = ({
                     {user.name}
                   </span>
                 </button>
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    title="Sign Out"
+                    className="p-3 rounded-xl text-amber-700 hover:text-red-600 hover:bg-red-50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-400 border border-transparent hover:border-red-200"
+                    aria-label="Sign out"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                )}
               </div>
             ) : (
               <div className="flex items-center space-x-3">
