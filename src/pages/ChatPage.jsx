@@ -139,6 +139,26 @@ const ChatPage = ({ user, onPageChange, updateProgress }) => {
 
       const responseText = agentResult.text || "I found some interesting cultural details for you.";
 
+      // Show source-specific toast so user knows which AI tier responded
+      const source = agentResult._source;
+      if (source === "rag_backend") {
+        toast.success("🧠 Answered via LangGraph RAG + MCP backend", {
+          duration: 3000,
+          style: { background: "#0f172a", color: "#f8fafc", border: "1px solid #6366f1", borderLeft: "4px solid #6366f1" },
+        });
+      } else if (source === "gemini") {
+        toast.success("✨ Answered by Gemini Flash AI", {
+          duration: 3000,
+          style: { background: "#0f172a", color: "#f8fafc", border: "1px solid #f59e0b", borderLeft: "4px solid #f59e0b" },
+        });
+      } else if (source === "offline") {
+        toast("📚 Showing offline cultural archive", {
+          duration: 3000,
+          icon: "📚",
+          style: { background: "#1e293b", color: "#cbd5e1", border: "1px solid #334155" },
+        });
+      }
+
       const botMessage = {
         id: Date.now() + 1,
         sender: "bot",
@@ -183,7 +203,7 @@ const ChatPage = ({ user, onPageChange, updateProgress }) => {
 
   const callGeminiAPI = async (message) => {
     const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
 
     const prompt = `You are BharatVerse AI Heritage Guide, an expert on Indian culture, heritage, monuments, festivals, arts, history, and traditions. 
 
