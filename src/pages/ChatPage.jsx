@@ -203,7 +203,7 @@ const ChatPage = ({ user, onPageChange, updateProgress }) => {
 
   const callGeminiAPI = async (message) => {
     const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${API_KEY}`;
 
     const prompt = `You are BharatVerse AI Heritage Guide, an expert on Indian culture, heritage, monuments, festivals, arts, history, and traditions. 
 

@@ -18,7 +18,7 @@ const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
  */
 export class CulturalLangGraphAgent {
   constructor() {
-    this.modelName = "gemini-2.5-flash";
+    this.modelName = "gemini-3.5-flash";
   }
 
   /**

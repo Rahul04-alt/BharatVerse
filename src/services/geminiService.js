@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({
-  model: "gemini-2.5-flash",
+  model: "gemini-3.5-flash",
   generationConfig: {
     temperature: 0.9, // Higher temperature = more random/diverse state choices
     topP: 0.95,

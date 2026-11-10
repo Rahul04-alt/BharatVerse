@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
+import { ArrowLeft, Lock, Sparkles, User, LogIn } from "lucide-react";
 
 // Components
 import Header from "./components/Header";
@@ -82,7 +83,7 @@ function App() {
     const initializeApp = async () => {
       try {
         await new Promise((res) => setTimeout(res, 2000));
-        login(dummyUser);
+        // Don't auto-login user so authentication gates (e.g. Quiz sign-in) work as expected
       } catch (error) {
         console.error("App initialization failed:", error);
       } finally {
@@ -90,7 +91,7 @@ function App() {
       }
     };
     initializeApp();
-  }, [login]);
+  }, []);
 
   const handlePageChange = (page, item = null) => {
     setCurrentPage(page);
@@ -168,6 +169,62 @@ function App() {
       case "gems":
         return <HiddenGemsPage {...pageProps} />;
       case "quiz":
+        if (!user) {
+          return (
+            <div className="fixed inset-0 flex justify-center items-center overflow-hidden bg-gradient-to-br from-amber-950 via-stone-900 to-black z-50 px-4">
+              {/* Back to Home Button */}
+              <button
+                onClick={() => handlePageChange("home")}
+                className="absolute top-8 left-8 z-50 flex items-center space-x-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 transition-all duration-300 group"
+              >
+                <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+                <span className="font-bold text-sm">Back to Home</span>
+              </button>
+
+              {/* Cultural Clerk-style Sign In Modal */}
+              <div className="relative max-w-md w-full bg-white/95 backdrop-blur-2xl rounded-3xl p-8 shadow-2xl border-2 border-amber-200 text-center animate-fade-in">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-500 to-red-500 flex items-center justify-center mx-auto mb-4 shadow-lg text-white">
+                  <Lock size={30} />
+                </div>
+
+                <div className="inline-flex items-center space-x-1 text-xs font-bold uppercase tracking-widest text-amber-700 bg-amber-50 px-3 py-1 rounded-full mb-3 border border-amber-200">
+                  <Sparkles size={12} className="text-amber-500" />
+                  <span>Cultural Quiz Arena</span>
+                </div>
+
+                <h2 className="text-2xl font-heritage font-bold text-amber-950 mb-2">
+                  Sign In to Access Quiz
+                </h2>
+                <p className="text-stone-600 text-sm mb-6 leading-relaxed">
+                  Join thousands of heritage explorers! Sign in to test your knowledge, track your XP, earn badges, and climb the national leaderboard.
+                </p>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => {
+                      login(dummyUser);
+                    }}
+                    className="w-full flex items-center justify-center space-x-2 px-6 py-3.5 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:from-amber-700 hover:via-orange-700 hover:to-red-700 transition-all duration-300 transform hover:scale-[1.02] active:scale-95"
+                  >
+                    <LogIn size={18} />
+                    <span>Continue as Heritage Explorer</span>
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange("home")}
+                    className="w-full px-6 py-2.5 text-stone-500 hover:text-stone-700 text-sm font-semibold transition-colors"
+                  >
+                    Explore Other Sections First
+                  </button>
+                </div>
+
+                <div className="mt-6 pt-5 border-t border-stone-200/60 text-xs text-stone-500 flex items-center justify-center space-x-1">
+                  <span>Protected by BharatVerse Cultural Identity</span>
+                </div>
+              </div>
+            </div>
+          );
+        }
         return <QuizPage {...pageProps} />;
       case "chat":
         return <ChatPage {...pageProps} />;
