@@ -16,21 +16,22 @@ if (!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY) {
   );
 }
 
-// Register Service Worker (optional, for PWA)
+// Clean up any legacy service workers that cause stale bundle cache issues
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then((registration) => {
-        console.log("✅ Service Worker registered:", registration);
-      })
-      .catch((registrationError) => {
-        console.warn(
-          "⚠️ Service Worker registration failed:",
-          registrationError
-        );
-      });
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      registration.unregister();
+    }
   });
+  if ("caches" in window) {
+    caches.keys().then((names) => {
+      for (const name of names) {
+        if (name.startsWith("bharatverse")) {
+          caches.delete(name);
+        }
+      }
+    });
+  }
 }
 
 // Render React App with Clerk Provider
