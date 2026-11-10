@@ -3,68 +3,51 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    "Missing Supabase environment variables! Please check your .env.local file"
+  );
+}
 
-// ✅ RLS BYPASS: Use service_role key for uploads (temp fix)
-const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-export const supabaseAdmin = serviceRoleKey
-  ? createClient(supabaseUrl, serviceRoleKey, {
-      auth: { autoRefreshToken: false },
-    })
-  : supabase;
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// ✅ BYPASS RLS - Use admin client
-export const uploadFileToStorage = async (file, filePath) => {
-  try {
-    console.log("📤 BYPASS RLS - Uploading:", filePath);
+/**
+ * Upload a file to the specified path in the 'heritage-uploads' bucket.
+ * @param {File | Blob} file - The file to upload.
+ * @param {string} path - The storage path for the file.
+ * @returns {Promise<{path: string, url: string}>} Object containing uploaded file path and public URL.
+ */
+export const uploadFileToStorage = async (file, path) => {
+  const { data, error } = await supabase.storage
+    .from("heritage-uploads")
+    .upload(path, file);
 
-    const client = supabaseAdmin || supabase;
+  if (error) throw error;
 
-    const { data, error } = await client.storage
-      .from("hidden-gems")
-      .upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+  const { data: urlData, error: urlError } = supabase.storage
+    .from("heritage-uploads")
+    .getPublicUrl(path);
 
-    if (error) {
-      console.error("❌ CRITICAL: Storage RLS still active");
-      console.error("Fix: Storage → hidden-gems → RLS OFF + Public ON");
-      throw new Error(`RLS BLOCK: ${error.message}`);
-    }
+  if (urlError) throw urlError;
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("hidden-gems").getPublicUrl(data.path);
-
-    console.log("✅ BYPASS SUCCESS:", publicUrl);
-    return { url: publicUrl, path: data.path };
-  } catch (error) {
-    console.error("🚨 STORAGE RLS ERROR - GO TO SUPABASE NOW");
-    throw error;
-  }
+  return {
+    path: data.path,
+    url: urlData.publicUrl,
+  };
 };
 
-// ✅ Database insert (RLS must be OFF on table)
-export const insertHeritageGem = async (data) => {
-  try {
-    console.log("💾 Inserting:", data.title);
+/**
+ * Insert a heritage gem record into the 'hidden_gems' table.
+ * Assumes gemData includes a valid submitter_id matching RLS policy.
+ * @param {Object} gemData - The data object representing the heritage gem.
+ * @returns {Promise<Object>} The inserted heritage gem record.
+ */
+export const insertHeritageGem = async (gemData) => {
+  const { data, error } = await supabase
+    .from("hidden_gems")
+    .insert([gemData])
+    .select();
 
-    const { data: insertedData, error } = await supabase
-      .from("hidden_gems")
-      .insert([data])
-      .select();
-
-    if (error) {
-      console.error("❌ TABLE RLS ERROR - DISABLE table RLS");
-      throw new Error(`Table RLS: ${error.message}`);
-    }
-
-    console.log("✅ INSERT SUCCESS:", insertedData[0]?.id);
-    return insertedData[0];
-  } catch (error) {
-    throw error;
-  }
+  if (error) throw error;
+  return data[0];
 };

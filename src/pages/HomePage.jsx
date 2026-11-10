@@ -24,7 +24,6 @@ import {
   Heart,
   Camera,
 } from "lucide-react";
-import ctaBg from "../assets/cta-bg.webp"; // Use your desired image and correct path
 import PanoViewer from "../components/PanoViewer";
 import SearchWidget from "../components/SearchWidget";
 import diwaliImg from "../assets/diwali.jpeg";
@@ -33,8 +32,10 @@ import rootBridgeImg from "../assets/hidden-gems/root-bridges.jpg";
 import goldenTempleImg from "../assets/punjab.jpeg";
 import redFortImg from "../assets/redfort.jpg";
 import tajMahalImg from "../assets/tajmahal.jpg";
+import ctaBg from '../assets/cta-bg.jpg'; // Use your desired image and correct path
+import homeVideo from "../assets/home2.mp4";
 
-import heroBgVideo from "../assets/home2.mp4"; // Adjust path & filename
+
 const HomePage = ({ onPageChange, user, bookmarks, addBookmark }) => {
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -261,9 +262,8 @@ const HomePage = ({ onPageChange, user, bookmarks, addBookmark }) => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section with background */}
+      {/* Hero Section with background video (matching deployed version) */}
       <section className="relative h-screen overflow-hidden flex items-center justify-center">
-        {/* Video Background */}
         <video
           autoPlay
           muted
@@ -271,10 +271,8 @@ const HomePage = ({ onPageChange, user, bookmarks, addBookmark }) => {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src={heroBgVideo} type="video/mp4" />
+          <source src={homeVideo} type="video/mp4" />
         </video>
-
-        {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/20" />
         <div className="relative z-10 max-w-6xl mx-auto h-full flex flex-col justify-center px-4">
           <div className="flex flex-col items-center text-center space-y-6">
@@ -432,7 +430,13 @@ const HomePage = ({ onPageChange, user, bookmarks, addBookmark }) => {
             {featuredSites.map((site, index) => (
               <div
                 key={site.id}
-                className="heritage-card relative group cursor-default transform hover:scale-[1.02] transition-all duration-500 overflow-hidden"
+                className="heritage-card relative group cursor-pointer transform hover:scale-[1.02] transition-all duration-500 overflow-hidden"
+                onClick={() => onPageChange("heritage", site)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") onPageChange("heritage", site);
+                }}
                 aria-label={`Explore featured heritage site: ${site.title}`}
               >
                 {/* Enhanced Badge */}
@@ -742,68 +746,69 @@ const HomePage = ({ onPageChange, user, bookmarks, addBookmark }) => {
       </section>
 
       {/* Call to Action */}
-      <section className="relative py-20 text-white overflow-hidden z-10">
-        {/* Background image and overlay */}
-        <div className="absolute inset-0 -z-10 w-full h-full">
-          <img
-            src={ctaBg}
-            alt="CTA background"
-            className="object-cover w-full h-full brightness-70"
-            draggable="false"
-          />
-          {/* Optional overlay for readability */}
-          <div className="absolute inset-0 bg-black/40"></div>
-        </div>
+<section className="relative py-20 text-white overflow-hidden z-10">
+  {/* Background image and overlay */}
+  <div className="absolute inset-0 -z-10 w-full h-full">
+    <img
+      src={ctaBg}
+      alt="CTA background"
+      className="object-cover w-full h-full brightness-60"
+      draggable="false"
+    />
+    {/* Optional overlay for readability */}
+    <div className="absolute inset-0 bg-black/40"></div>
+  </div>
 
-        {/* Animated spinning circles, preserved from your original */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-32 h-32 border-2 border-white rounded-full animate-spin-slow"></div>
-          <div
-            className="absolute bottom-10 right-10 w-24 h-24 border-2 border-white rounded-full animate-spin-slow"
-            style={{ animationDelay: "1s" }}
-          ></div>
-          <div
-            className="absolute top-1/2 left-1/4 w-16 h-16 border-2 border-white rounded-full animate-spin-slow"
-            style={{ animationDelay: "2s" }}
-          ></div>
-        </div>
+  {/* Animated spinning circles, preserved from your original */}
+  <div className="absolute inset-0 opacity-10">
+    <div className="absolute top-10 left-10 w-32 h-32 border-2 border-white rounded-full animate-spin-slow"></div>
+    <div
+      className="absolute bottom-10 right-10 w-24 h-24 border-2 border-white rounded-full animate-spin-slow"
+      style={{ animationDelay: "1s" }}
+    ></div>
+    <div
+      className="absolute top-1/2 left-1/4 w-16 h-16 border-2 border-white rounded-full animate-spin-slow"
+      style={{ animationDelay: "2s" }}
+    ></div>
+  </div>
 
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-4xl md:text-6xl font-heritage font-bold mb-8">
-            Begin Your Heritage Journey Today
-          </h2>
-          <p className="text-xl md:text-2xl mb-12 max-w-4xl mx-auto opacity-90 leading-relaxed">
-            Join millions of culture enthusiasts exploring India's incredible
-            heritage through our immersive digital experiences.
-          </p>
+  <div className="container mx-auto px-4 text-center relative z-10">
+    <h2 className="text-4xl md:text-6xl font-heritage font-bold mb-8">
+      Begin Your Heritage Journey Today
+    </h2>
+    <p className="text-xl md:text-2xl mb-12 max-w-4xl mx-auto opacity-90 leading-relaxed">
+      Join millions of culture enthusiasts exploring India's incredible
+      heritage through our immersive digital experiences.
+    </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
-            <button
-              onClick={() => onPageChange("states")}
-              className="bg-white text-heritage-red-600 px-10 py-5 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 flex items-center space-x-3 shadow-xl"
-            >
-              <MapPin size={24} />
-              <span>Explore by States</span>
-            </button>
-            <button
-              onClick={() => onPageChange("festivals")}
-              className="bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-10 py-5 rounded-xl font-semibold text-lg hover:bg-white/30 transition-all duration-300 flex items-center space-x-3"
-            >
-              <Calendar size={24} />
-              <span>Discover Festivals</span>
-            </button>
-          </div>
+    <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 mb-8">
+      <button
+        onClick={() => onPageChange("states")}
+        className="bg-white text-heritage-red-600 px-10 py-5 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 flex items-center space-x-3 shadow-xl"
+      >
+        <MapPin size={24} />
+        <span>Explore by States</span>
+      </button>
+      <button
+        onClick={() => onPageChange("festivals")}
+        className="bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white px-10 py-5 rounded-xl font-semibold text-lg hover:bg-white/30 transition-all duration-300 flex items-center space-x-3"
+      >
+        <Calendar size={24} />
+        <span>Discover Festivals</span>
+      </button>
+    </div>
 
-          <blockquote className="max-w-3xl mx-auto italic opacity-90 mb-4 text-lg">
-            "BharatVerse opened my eyes to the incredible depth of Indian
-            culture. The 360° tours made me feel like I was actually walking
-            through the Taj Mahal!"
-          </blockquote>
-          <cite className="text-sm opacity-80">
-            — Priya S., Cultural Enthusiast
-          </cite>
-        </div>
-      </section>
+    <blockquote className="max-w-3xl mx-auto italic opacity-90 mb-4 text-lg">
+      "BharatVerse opened my eyes to the incredible depth of Indian
+      culture. The 360° tours made me feel like I was actually walking
+      through the Taj Mahal!"
+    </blockquote>
+    <cite className="text-sm opacity-80">
+      — Priya S., Cultural Enthusiast
+    </cite>
+  </div>
+</section>
+
       {/* Newsletter Signup */}
       {!user && (
         <section className="py-16 bg-gray-50">

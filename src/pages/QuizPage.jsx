@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
 import {
   Trophy,
   Clock,
@@ -26,29 +25,27 @@ import {
   Eye,
   Shield,
   ChevronRight,
-  Loader,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Quiz from "../components/Quiz";
 import quizQuestionsData from "../data/quiz_questions.json";
-import { getUserQuizStats, getUserQuizHistory } from "../services/quizService";
-import { getUserBadges } from "../services/badgeService";
-import { getUserData } from "../services/userService";
+
+//changes 
 import heritageQuizHero from "../assets/quiz-page.jpg";
 
-const QuizPage = ({ onPageChange, isSignedIn }) => {
-  const { user: clerkUser, isLoaded } = useUser();
+
+const QuizPage = ({ onPageChange, user, updateProgress, userProgress }) => {
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [userStats, setUserStats] = useState({
     totalQuizzes: 0,
     averageScore: 0,
     bestScore: 0,
     totalPoints: 0,
     badges: [],
-    quizHistory: [],
   });
+
+  
 
   const quizCategories = [
     {
@@ -57,8 +54,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       description:
         "Test your knowledge about India's magnificent monuments and architectural marvels",
       difficulty: "Mixed",
-      questions:
-        quizQuestionsData["heritage-monuments"]?.questions?.length || 0,
+      questions: quizQuestionsData["heritage-monuments"].questions.length,
       icon: Landmark,
       color: "from-orange-500 to-red-500",
       estimatedTime: "10 min",
@@ -71,7 +67,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       description:
         "Explore the vibrant world of Indian festivals and celebrations",
       difficulty: "Easy",
-      questions: quizQuestionsData["festivals"]?.questions?.length || 0,
+      questions: quizQuestionsData["festivals"].questions.length,
       icon: Calendar,
       color: "from-purple-500 to-pink-500",
       estimatedTime: "8 min",
@@ -84,7 +80,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       description:
         "Challenge yourself on traditional dances, music, and art forms",
       difficulty: "Hard",
-      questions: quizQuestionsData["classical-arts"]?.questions?.length || 0,
+      questions: quizQuestionsData["classical-arts"].questions.length,
       icon: Music,
       color: "from-blue-500 to-indigo-500",
       estimatedTime: "12 min",
@@ -97,7 +93,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       description:
         "Journey through India's ancient civilizations and historical events",
       difficulty: "Hard",
-      questions: quizQuestionsData["ancient-history"]?.questions?.length || 0,
+      questions: quizQuestionsData["ancient-history"].questions.length,
       icon: Scroll,
       color: "from-green-500 to-teal-500",
       estimatedTime: "15 min",
@@ -110,7 +106,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       description:
         "Discover the diverse cultural traditions across Indian states",
       difficulty: "Medium",
-      questions: quizQuestionsData["regional-culture"]?.questions?.length || 0,
+      questions: quizQuestionsData["regional-culture"].questions.length,
       icon: Globe,
       color: "from-yellow-500 to-orange-500",
       estimatedTime: "11 min",
@@ -122,7 +118,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       title: "Hidden Gems",
       description: "Explore lesser-known heritage sites and cultural treasures",
       difficulty: "Expert",
-      questions: quizQuestionsData["hidden-gems"]?.questions?.length || 0,
+      questions: quizQuestionsData["hidden-gems"].questions.length,
       icon: Gem,
       color: "from-emerald-500 to-cyan-500",
       estimatedTime: "10 min",
@@ -131,132 +127,6 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
     },
   ];
 
-  // Load user stats on component mount
-  useEffect(() => {
-    const loadUserQuizData = async () => {
-      if (isLoaded && isSignedIn && clerkUser) {
-        try {
-          console.log("📥 Loading user quiz data from Supabase...");
-
-          // Get user from database
-          const userData = await getUserData(clerkUser.id);
-
-          if (!userData) {
-            console.error("❌ User not found in database");
-            setLoading(false);
-            return;
-          }
-
-          // Load all quiz data in parallel
-          const [stats, history, userBadges] = await Promise.all([
-            getUserQuizStats(userData.id),
-            getUserQuizHistory(userData.id),
-            getUserBadges(userData.id),
-          ]);
-
-          // Calculate badges array for display
-          const badgeNames = userBadges.map((b) => b.badge_name);
-
-          setUserStats({
-            totalQuizzes: stats?.total_quizzes || 0,
-            averageScore: stats?.average_score || 0,
-            bestScore: stats?.highest_score || 0,
-            totalPoints: userData.total_points || 0,
-            badges: badgeNames,
-            quizHistory: history || [],
-          });
-
-          console.log("✅ Quiz data loaded successfully");
-        } catch (error) {
-          console.error("❌ Error loading quiz data:", error);
-
-          // Use default stats if error
-          setUserStats({
-            totalQuizzes: 0,
-            averageScore: 0,
-            bestScore: 0,
-            totalPoints: 0,
-            badges: [],
-            quizHistory: [],
-          });
-        }
-      }
-      setLoading(false);
-    };
-
-    loadUserQuizData();
-  }, [isLoaded, isSignedIn, clerkUser]);
-
-  // Handle quiz completion
-  const handleQuizComplete = async (results) => {
-    if (!clerkUser || !isSignedIn || !isLoaded) {
-      console.error("❌ User not authenticated");
-      return;
-    }
-
-    console.log("✅ Quiz completed, refreshing stats...");
-
-    try {
-      // Get fresh user data
-      const userData = await getUserData(clerkUser.id);
-
-      if (!userData) {
-        console.error("❌ User not found");
-        return;
-      }
-
-      // Load updated stats
-      const [stats, history, userBadges] = await Promise.all([
-        getUserQuizStats(userData.id),
-        getUserQuizHistory(userData.id),
-        getUserBadges(userData.id),
-      ]);
-
-      const badgeNames = userBadges.map((b) => b.badge_name);
-
-      setUserStats({
-        totalQuizzes: stats?.total_quizzes || 0,
-        averageScore: stats?.average_score || 0,
-        bestScore: stats?.highest_score || 0,
-        totalPoints: userData.total_points || 0,
-        badges: badgeNames,
-        quizHistory: history || [],
-      });
-
-      console.log("✅ Stats refreshed after quiz completion");
-    } catch (error) {
-      console.error("❌ Error refreshing stats:", error);
-    }
-
-    setSelectedQuiz(null);
-  };
-
-  const checkAchievements = (results, totalQuizzes, timeSpent) => {
-    const newBadges = [];
-
-    if (results.percentage === 100) {
-      newBadges.push("Perfectionist");
-    }
-
-    if (results.percentage >= 80 && selectedQuiz?.id === "heritage-monuments") {
-      newBadges.push("Heritage Master");
-    }
-
-    if (totalQuizzes >= 5) {
-      newBadges.push("Culture Guru");
-    }
-
-    if (timeSpent < 300) {
-      newBadges.push("Speed Demon");
-    }
-
-    if (totalQuizzes >= 10) {
-      newBadges.push("Dedicated Learner");
-    }
-
-    return newBadges;
-  };
-
   const achievements = [
     {
       id: "first-quiz",
@@ -264,15 +134,15 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       description: "Complete your first quiz",
       icon: Target,
       color: "text-blue-600",
-      unlocked: userStats.totalQuizzes >= 1,
+      unlocked: true,
     },
     {
-      id: "perfectionist",
+      id: "perfect-score",
       name: "Perfectionist",
       description: "Score 100% on any quiz",
       icon: Crown,
       color: "text-yellow-600",
-      unlocked: userStats.badges.includes("Perfectionist"),
+      unlocked: false,
     },
     {
       id: "heritage-master",
@@ -280,15 +150,15 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       description: "Score 80%+ on Heritage quiz",
       icon: Medal,
       color: "text-orange-600",
-      unlocked: userStats.badges.includes("Heritage Master"),
+      unlocked: false,
     },
     {
       id: "culture-guru",
       name: "Culture Guru",
-      description: "Complete 5 different quizzes",
+      description: "Complete 5 different quiz categories",
       icon: Brain,
       color: "text-purple-600",
-      unlocked: userStats.badges.includes("Culture Guru"),
+      unlocked: false,
     },
     {
       id: "speed-demon",
@@ -296,15 +166,15 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       description: "Complete a quiz in under 5 minutes",
       icon: Zap,
       color: "text-red-600",
-      unlocked: userStats.badges.includes("Speed Demon"),
+      unlocked: false,
     },
     {
       id: "dedicated-learner",
       name: "Dedicated Learner",
-      description: "Take 10+ quizzes",
+      description: "Take quizzes for 7 consecutive days",
       icon: BookMarked,
       color: "text-green-600",
-      unlocked: userStats.badges.includes("Dedicated Learner"),
+      unlocked: false,
     },
   ];
 
@@ -346,15 +216,65 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
     },
     {
       rank: 6,
-      name: clerkUser?.firstName
-        ? `${clerkUser.firstName} ${clerkUser.lastName || ""}`
-        : "You",
+      name: "You",
       points: userStats.totalPoints,
       badge: Target,
       color: "text-green-500",
-      isCurrentUser: true,
     },
   ];
+
+  useEffect(() => {
+    const stats = {
+      totalQuizzes: userProgress?.quizzesTaken?.length || 0,
+      averageScore: userProgress?.averageScore || 0,
+      bestScore: userProgress?.bestScore || 0,
+      totalPoints: userProgress?.totalPoints || 0,
+      badges: userProgress?.badgesEarned || [],
+    };
+    setUserStats(stats);
+  }, [userProgress]);
+
+  const handleQuizComplete = (results) => {
+    const points = Math.round(
+      results.score * 10 + (results.score === results.total ? 50 : 0)
+    );
+
+    updateProgress("quizzesTaken", {
+      quizId: selectedQuiz.id,
+      score: results.score,
+      total: results.total,
+      points: points,
+      completedAt: new Date().toISOString(),
+    });
+
+    updateProgress("totalPoints", points);
+
+    checkAchievements(results);
+
+    setSelectedQuiz(null);
+  };
+
+  const checkAchievements = (results) => {
+    const newBadges = [];
+
+    if (
+      results.score === results.total &&
+      !userStats.badges.includes("perfect-score")
+    ) {
+      newBadges.push("perfect-score");
+    }
+
+    if (
+      results.score / results.total >= 0.8 &&
+      selectedQuiz.id === "heritage-monuments"
+    ) {
+      newBadges.push("heritage-master");
+    }
+
+    newBadges.forEach((badge) => {
+      updateProgress("badgesEarned", badge);
+    });
+  };
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty.toLowerCase()) {
@@ -390,22 +310,13 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
     setSelectedQuiz(null);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-center">
-          <Loader className="animate-spin mx-auto mb-4" size={48} />
-          <p className="text-gray-600">Loading your quiz data...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       {!selectedQuiz && (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-          {/* Hero Header */}
+
+
+          {/* //changes */}
           {/* Hero Header */}
           <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-16 md:py-20 relative overflow-hidden">
             {/* subtle decorative icons (optional – you already have them) */}
@@ -433,9 +344,9 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
                     </h1>
                   </div>
                   <p className="text-lg md:text-xl max-w-xl opacity-90 leading-relaxed">
-                    Test your knowledge of India&apos;s monuments, festivals,
-                    classical arts and timeless traditions. Earn points, unlock
-                    badges, and become a true heritage explorer.
+                    Test your knowledge of India&apos;s monuments, festivals, classical
+                    arts and timeless traditions. Earn points, unlock badges, and become
+                    a true heritage explorer.
                   </p>
 
                   <div className="mt-6 flex flex-wrap gap-3 text-sm">
@@ -474,9 +385,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                           Discover India
                         </p>
-                        <p className="text-sm font-bold">
-                          25+ heritage quiz themes
-                        </p>
+                        <p className="text-sm font-bold">25+ heritage quiz themes</p>
                       </div>
                     </div>
                   </div>
@@ -487,49 +396,69 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
 
           {/* yha tk */}
 
-          {/* Quiz History */}
-          {userStats.quizHistory.length > 0 && (
+          {/* User Stats Dashboard */}
+          {user && (
             <div className="container mx-auto px-4 py-12 mb-16">
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-6">
-                Your Recent Quizzes
-              </h2>
-              <div className="space-y-4">
-                {userStats.quizHistory.slice(0, 5).map((quiz, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="bg-white rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-shadow"
-                  >
-                    <div>
-                      <h4 className="font-semibold text-gray-800">
-                        {quiz.quiz_type}
-                      </h4>
-                      <p className="text-sm text-gray-600">
-                        {new Date(quiz.completed_at).toLocaleDateString()} at{" "}
-                        {new Date(quiz.completed_at).toLocaleTimeString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-amber-600">
-                        {Math.round(quiz.percentage)}%
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {quiz.score}/{quiz.total_questions}
+              <div className="heritage-card p-8 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-2xl">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="text-center group">
+                    <div className="flex items-center justify-center mb-2">
+                      <BookOpen
+                        className="text-black mr-2 group-hover:animate-pulse"
+                        size={24}
+                      />
+                      <div className="text-black text-4xl font-bold">
+                        {userStats.totalQuizzes}
                       </div>
                     </div>
-                  </motion.div>
-                ))}
+                    <div className="text-indigo-500">Quizzes Completed</div>
+                  </div>
+                  <div className="text-center group">
+                    <div className="text-black flex items-center justify-center mb-2">
+                      <TrendingUp
+                        className="mr-2 group-hover:animate-pulse"
+                        size={24}
+                      />
+                      <div className=" text-black text-4xl font-bold">
+                        {userStats.totalPoints}
+                      </div>
+                    </div>
+                    <div className="text-indigo-500">Total Points</div>
+                  </div>
+                  <div className="text-center group">
+                    <div className="flex items-center justify-center mb-2">
+                      <Trophy
+                        className=" text-black mr-2 group-hover:animate-pulse"
+                        size={24}
+                      />
+                      <div className=" text-black text-4xl font-bold">
+                        {userStats.bestScore}%
+                      </div>
+                    </div>
+                    <div className="text-indigo-500">Best Score</div>
+                  </div>
+                  <div className="text-center group">
+                    <div className="flex items-center justify-center mb-2">
+                      <Award
+                        className="text-black mr-2 group-hover:animate-pulse"
+                        size={24}
+                      />
+                      <div className=" text-black text-4xl font-bold">
+                        {userStats.badges.length}
+                      </div>
+                    </div>
+                    <div className="text-indigo-500">Badges Earned</div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
-          {/* Quiz Categories Section */}
+          {/* Quiz Categories */}
           <div className="container mx-auto px-4 py-12 mb-16">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4 flex items-center justify-center">
-                <Target className="mr-3 text-orange-600" size={40} />
+              <h2 className="text-4xl font-heritage font-bold heritage-text-gradient mb-4 flex items-center justify-center">
+                <Target className="mr-3 text-saffron-600" size={40} />
                 Choose Your Challenge
               </h2>
               <p className="text-gray-600 max-w-3xl mx-auto">
@@ -548,9 +477,10 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-white rounded-2xl cursor-pointer group hover:shadow-xl transition-all duration-300 overflow-hidden"
+                    className="heritage-card cursor-pointer group hover:shadow-xl transition-all duration-300 overflow-hidden"
                     onClick={() => setSelectedQuiz(category)}
                   >
+                    {/* Header with gradient */}
                     <div
                       className={`bg-gradient-to-r ${category.color} p-6 text-white relative`}
                     >
@@ -577,7 +507,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
                           </span>
                         </div>
                       </div>
-                      <h3 className="text-2xl font-bold mb-2 relative z-10">
+                      <h3 className="text-2xl font-heritage font-bold mb-2 relative z-10">
                         {category.title}
                       </h3>
                       <p className="text-white/90 text-sm leading-relaxed relative z-10">
@@ -585,6 +515,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
                       </p>
                     </div>
 
+                    {/* Details */}
                     <div className="p-6 bg-white">
                       <div className="flex items-center justify-between text-sm text-gray-600 mb-6">
                         <div className="flex items-center space-x-2">
@@ -600,7 +531,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
                           </span>
                         </div>
                       </div>
-                      <button className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold rounded-lg group-hover:scale-105 transition-transform duration-300 flex items-center justify-center space-x-2">
+                      <button className="w-full btn-heritage py-3 group-hover:scale-105 transition-transform duration-300 flex items-center justify-center space-x-2">
                         <span>Start Quiz</span>
                         <ChevronRight
                           size={18}
@@ -617,8 +548,8 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
           {/* Achievements Section */}
           <div className="container mx-auto px-4 py-12 mb-16">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4 flex items-center justify-center">
-                <Medal className="mr-3 text-orange-600" size={40} />
+              <h2 className="text-4xl font-heritage font-bold heritage-text-gradient mb-4 flex items-center justify-center">
+                <Medal className="mr-3 text-saffron-600" size={40} />
                 Achievements & Badges
               </h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
@@ -635,32 +566,28 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`bg-white rounded-xl text-center p-6 group transition-all duration-300 ${
-                      achievement.unlocked
+                    className={`heritage-card text-center p-6 group transition-all duration-300 ${achievement.unlocked
                         ? "bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 hover:shadow-lg"
                         : "bg-gray-50 opacity-60 hover:opacity-80"
-                    }`}
+                      }`}
                   >
                     <div
-                      className={`mb-3 ${
-                        achievement.unlocked ? "animate-bounce" : ""
-                      }`}
+                      className={`mb-3 ${achievement.unlocked ? "animate-bounce" : ""
+                        }`}
                     >
                       <IconComponent
                         size={36}
-                        className={`mx-auto ${
-                          achievement.unlocked
+                        className={`mx-auto ${achievement.unlocked
                             ? achievement.color
                             : "text-gray-400"
-                        } group-hover:scale-110 transition-transform`}
+                          } group-hover:scale-110 transition-transform`}
                       />
                     </div>
                     <h3
-                      className={`font-bold text-sm mb-2 ${
-                        achievement.unlocked
+                      className={`font-bold text-sm mb-2 ${achievement.unlocked
                           ? "text-yellow-800"
                           : "text-gray-500"
-                      }`}
+                        }`}
                     >
                       {achievement.name}
                     </h3>
@@ -685,7 +612,7 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
           <div className="text-center mb-16">
             <button
               onClick={() => setShowLeaderboard(!showLeaderboard)}
-              className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold rounded-lg flex items-center space-x-2 mx-auto text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="btn-heritage px-8 py-4 flex items-center space-x-2 mx-auto text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
             >
               <Trophy size={24} className="animate-pulse" />
               <span>{showLeaderboard ? "Hide" : "Show"} Leaderboard</span>
@@ -701,81 +628,74 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
                 exit={{ opacity: 0, height: 0 }}
                 className="mb-16"
               >
-                <div className="container mx-auto px-4">
-                  <div className="bg-white rounded-2xl p-8 shadow-2xl">
-                    <div className="text-center mb-8">
-                      <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4 flex items-center justify-center">
-                        <Trophy
-                          className="mr-3 text-yellow-500 animate-pulse"
-                          size={32}
-                        />
-                        Weekly Leaderboard
-                      </h2>
-                      <p className="text-gray-600">
-                        See how you rank against other heritage enthusiasts
-                      </p>
-                    </div>
-                    <div className="space-y-4">
-                      {leaderboard.map((player, index) => {
-                        const BadgeIcon = player.badge;
-                        return (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                            className={`flex items-center justify-between p-6 rounded-xl transition-all duration-300 hover:scale-102 ${
-                              player.isCurrentUser
-                                ? "bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-blue-300 shadow-md"
-                                : "bg-gray-50 hover:bg-gray-100"
+                <div className="heritage-card p-8 shadow-2xl">
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl font-heritage font-bold heritage-text-gradient mb-4 flex items-center justify-center">
+                      <Trophy
+                        className="mr-3 text-yellow-500 animate-pulse"
+                        size={32}
+                      />
+                      Weekly Leaderboard
+                    </h2>
+                    <p className="text-gray-600">
+                      See how you rank against other heritage enthusiasts
+                    </p>
+                  </div>
+                  <div className="space-y-4">
+                    {leaderboard.map((player, index) => {
+                      const BadgeIcon = player.badge;
+                      return (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className={`flex items-center justify-between p-6 rounded-xl transition-all duration-300 hover:scale-102 ${player.name === "You"
+                              ? "bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-blue-300 shadow-md"
+                              : "bg-gray-50 hover:bg-gray-100"
                             }`}
-                          >
-                            <div className="flex items-center space-x-4">
-                              <div
-                                className={`text-2xl font-bold w-8 text-center ${
-                                  index === 0
-                                    ? "text-yellow-500"
-                                    : index === 1
+                        >
+                          <div className="flex items-center space-x-4">
+                            <div
+                              className={`text-2xl font-bold w-8 text-center ${index === 0
+                                  ? "text-yellow-500"
+                                  : index === 1
                                     ? "text-gray-400"
                                     : index === 2
-                                    ? "text-amber-600"
-                                    : "text-gray-600"
+                                      ? "text-amber-600"
+                                      : "text-gray-600"
                                 }`}
-                              >
-                                #{player.rank}
-                              </div>
-                              <div className="p-2 rounded-lg bg-white shadow-sm">
-                                <BadgeIcon size={24} className={player.color} />
-                              </div>
-                              <div>
-                                <div
-                                  className={`font-semibold text-lg ${
-                                    player.isCurrentUser
-                                      ? "text-blue-800"
-                                      : "text-gray-900"
+                            >
+                              #{player.rank}
+                            </div>
+                            <div className="p-2 rounded-lg bg-white shadow-sm">
+                              <BadgeIcon size={24} className={player.color} />
+                            </div>
+                            <div>
+                              <div
+                                className={`font-semibold text-lg ${player.name === "You"
+                                    ? "text-blue-800"
+                                    : "text-gray-900"
                                   }`}
-                                >
-                                  {player.name}
-                                </div>
-                                <div className="text-sm text-gray-600 flex items-center space-x-1">
-                                  <Users size={12} />
-                                  <span>Heritage Explorer</span>
-                                </div>
+                              >
+                                {player.name}
+                              </div>
+                              <div className="text-sm text-gray-600 flex items-center space-x-1">
+                                <Users size={12} />
+                                <span>Heritage Explorer</span>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-2xl font-bold text-indigo-600 flex items-center space-x-2">
-                                <TrendingUp size={20} />
-                                <span>{player.points.toLocaleString()}</span>
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                points
-                              </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-indigo-600 flex items-center space-x-2">
+                              <TrendingUp size={20} />
+                              <span>{player.points.toLocaleString()}</span>
                             </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
+                            <div className="text-sm text-gray-600">points</div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
                   </div>
                 </div>
               </motion.div>
@@ -783,29 +703,29 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
           </AnimatePresence>
 
           {/* Study Materials */}
-          <div className="container mx-auto px-4 mb-16">
-            <div className="rounded-2xl p-8 bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-2xl">
+          <div className="mb-16">
+            <div className="heritage-card p-8 bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-2xl">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
-                  <h3 className="text-white text-3xl font-bold mb-4 flex items-center">
+                  <h3 className="text-green-700 text-3xl font-heritage font-bold mb-4 flex items-center">
                     <BookOpen className="mr-3" size={36} />
                     Study Before Your Quiz
                   </h3>
-                  <p className="text-green-100 mb-6 leading-relaxed">
+                  <p className="text-green-700 mb-6 leading-relaxed">
                     Improve your scores by exploring our heritage content before
                     taking quizzes. Learn about monuments, festivals, arts, and
                     cultural traditions.
                   </p>
                   <div className="space-y-4">
-                    <div className="text-white flex items-center space-x-3">
+                    <div className="text-purple-500 flex items-center space-x-3">
                       <BookOpen size={20} />
                       <span>Interactive heritage guides</span>
                     </div>
-                    <div className="text-white flex items-center space-x-3">
+                    <div className=" text-black flex items-center space-x-3">
                       <Star size={20} />
                       <span>Expert-curated content</span>
                     </div>
-                    <div className="text-white flex items-center space-x-3">
+                    <div className="text-purple-500 flex items-center space-x-3">
                       <Zap size={20} />
                       <span>Quick learning modules</span>
                     </div>
@@ -813,11 +733,11 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
                 </div>
                 <div className="text-center">
                   <div className="mb-6">
-                    <MapPin size={80} className="mx-auto text-white" />
+                    <MapPin size={80} className="mx-auto text-green-500 " />
                   </div>
                   <button
                     onClick={() => onPageChange("heritage")}
-                    className="px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-colors text-lg shadow-lg flex items-center space-x-2 mx-auto bg-white text-green-600"
+                    className="btn-heritage bg-white text-green-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-colors text-lg shadow-lg flex items-center space-x-2 mx-auto"
                   >
                     <span>Explore Heritage Content</span>
                     <ChevronRight size={18} />
@@ -830,13 +750,10 @@ const QuizPage = ({ onPageChange, isSignedIn }) => {
       )}
       {selectedQuiz && (
         <Quiz
-          isSignedIn={isSignedIn}
           quizData={quizQuestionsData[selectedQuiz.id]}
           category={selectedQuiz}
           onComplete={handleQuizComplete}
           onGoBack={handleGoBackToCategories}
-          selectedQuiz={selectedQuiz}
-          checkAchievements={checkAchievements}
         />
       )}
     </>

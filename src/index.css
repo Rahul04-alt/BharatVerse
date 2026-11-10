@@ -471,3 +471,19 @@ body {
 .accordion-content {
   @apply px-6 py-4 border-b border-gray-200;
 }
+
+body.video-bg {
+  background: transparent !important;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-10deg);}
+  50% { transform: rotate(10deg);}
+}
+.animate-wiggle {
+  animation: wiggle 1.6s infinite ease-in-out;
+}
+
+
+
+

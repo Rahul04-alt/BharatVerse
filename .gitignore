@@ -1,3 +1,18 @@
+# Large video assets (>100MB exceeds GitHub push limits)
+public/rituals3.mp4
+src/assets/hgv2.mp4
+
+# Server cache & local dependencies
+server/node_modules/
+server/cache/
+
+# Environment files
+.env
+.env*.local
+.env.production
+.env.development
+!.env.example
+
 # Logs
 logs
 *.log

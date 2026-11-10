@@ -62,20 +62,27 @@ import lakshadweepImg from "../assets/lakshadweep.jpg";
 import puducherryImg from "../assets/puducherry.jpg";
 
 //page video
-import statesBg from "../assets/st2.jpg";
+import statesBg from '../assets/st2.jpg';
 import video from "../assets/video1.mp4";
+
 
 // ... other imports
 
 const StatesPage = ({ onPageChange }) => {
   useEffect(() => {
-    document.body.classList.add("video-bg");
+    document.body.classList.add('video-bg');
     return () => {
-      document.body.classList.remove("video-bg");
+      document.body.classList.remove('video-bg');
     };
   }, []);
 
   // ...rest of your component code
+
+
+
+
+
+
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("all");
@@ -277,71 +284,65 @@ const StatesPage = ({ onPageChange }) => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" >
       {/* Hero Section */}
-
-      <div
-        className="relative h-screen overflow-hidden flex items-center justify-center !bg-transparent"
-        style={{ background: "transparent" }}
-      >
-        {/* Background Video */}
-        <video
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ zIndex: 0 }}
-          src={video}
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-
-        {/* Dark Overlay for Better Text Readability */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60 pointer-events-none"
-          style={{ zIndex: 1 }}
-        ></div>
-
-        {/* page content */}
-        <div
-          className="container mx-auto px-4 text-center relative"
-          style={{ zIndex: 2 }}
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-5xl md:text-7xl font-heritage font-bold mb-6 text-white drop-shadow-lg">
-              Discover India
-            </h1>
-            <p className="text-xl md:text-2xl max-w-4xl mx-auto text-white leading-relaxed mb-8 drop-shadow-md font-medium">
-              Explore 28 vibrant states and 8 union territories, each with
-              unique heritage, culture, and traditions that make India truly
-              incredible
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm">
-              <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:bg-white/35 transition-all">
-                <span className="font-bold text-white">28</span>
-                <span className="text-white/90"> States</span>
-              </div>
-              <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:bg-white/35 transition-all">
-                <span className="font-bold text-white">8</span>
-                <span className="text-white/90"> Union Territories</span>
-              </div>
-              <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:bg-white/35 transition-all">
-                <span className="font-bold text-white">40+</span>
-                <span className="text-white/90"> Heritage Sites</span>
-              </div>
-              <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:bg-white/35 transition-all">
-                <span className="font-bold text-white">1000+</span>
-                <span className="text-white/90"> Languages</span>
-              </div>
-            </div>
-          </motion.div>
+      
+<div className="relative h-screen overflow-hidden flex items-center justify-center !bg-transparent" style={{ background: 'transparent' }}>
+  
+  {/* Background Video */}
+  <video
+    className="absolute inset-0 w-full h-full object-cover"
+    style={{ zIndex: 0 }}
+    src={video}
+    autoPlay
+    loop
+    muted
+    playsInline
+  />
+  
+  {/* Dark Overlay for Better Text Readability */}
+  <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60 pointer-events-none" style={{ zIndex: 1 }}></div>
+  
+  {/* page content */}
+  <div className="container mx-auto px-4 text-center relative" style={{ zIndex: 2 }}>
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <h1 className="text-5xl md:text-7xl font-heritage font-bold mb-6 text-white drop-shadow-lg">
+        Discover India
+      </h1>
+      <p className="text-xl md:text-2xl max-w-4xl mx-auto text-white leading-relaxed mb-8 drop-shadow-md font-medium">
+        Explore 28 vibrant states and 8 union territories, each with
+        unique heritage, culture, and traditions that make India truly
+        incredible
+      </p>
+      <div className="flex flex-wrap justify-center gap-4 text-sm">
+        <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:bg-white/35 transition-all">
+          <span className="font-bold text-white">28</span>
+          <span className="text-white/90"> States</span>
+        </div>
+        <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:bg-white/35 transition-all">
+          <span className="font-bold text-white">8</span>
+          <span className="text-white/90"> Union Territories</span>
+        </div>
+        <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:bg-white/35 transition-all">
+          <span className="font-bold text-white">40+</span>
+          <span className="text-white/90"> Heritage Sites</span>
+        </div>
+        <div className="bg-white/25 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 hover:bg-white/35 transition-all">
+          <span className="font-bold text-white">1000+</span>
+          <span className="text-white/90"> Languages</span>
         </div>
       </div>
+    </motion.div>
+  </div>
+  
+</div>
 
       {/* huh */}
+
 
       <div className="container mx-auto px-4 py-12">
         {/* Search & Filters */}
@@ -984,15 +985,16 @@ const StatesPage = ({ onPageChange }) => {
       {/* Call to Action */}
       <section className="relative py-20 text-white overflow-hidden z-10">
         <div className="absolute inset-0 -z-10 w-full h-full">
-          <img
-            src={statesBg}
-            alt="CTA background"
-            className="object-cover w-full h-full brightness-100"
-            draggable="false"
-          />
-          {/* Optional overlay for readability */}
-          <div className="absolute inset-0 bg-black/40"></div>
-        </div>
+            <img
+              src={statesBg}
+              alt="CTA background"
+              className="object-cover w-full h-full brightness-100"
+              draggable="false"
+            />
+            {/* Optional overlay for readability */}
+            <div className="absolute inset-0 bg-black/40"></div>
+          </div>
+
 
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
@@ -1029,5 +1031,6 @@ const StatesPage = ({ onPageChange }) => {
     </div>
   );
 };
+
 
 export default StatesPage;

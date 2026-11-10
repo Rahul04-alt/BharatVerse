@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import hiddenGemsData from "../data/hiddengems.json";
-import { ASSETS } from "../constants/assets";
 
 // Import all images
 import chandBaoriImg from "../assets/hidden-gems/chand-baori.jpg";
@@ -37,6 +36,8 @@ import lonarCraterImg from "../assets/hidden-gems/lonar-crater.jpeg";
 import magneticHillImg from "../assets/hidden-gems/magnetic-hill.jpg";
 import rootBridgesImg from "../assets/hidden-gems/root-bridges.jpg";
 import kolukkumalaiImg from "../assets/hidden-gems/kolukkumalai.jpg";
+//video
+import video from "../assets/hgv2.mp4";
 
 // Image mapping object
 const imageMap = {
@@ -64,7 +65,7 @@ const imageMap = {
   "kolukkumalai.jpg": kolukkumalaiImg,
 };
 
-const HiddenGemsPage = ({ onPageChange, addBookmark, isBookmarked }) => {
+const HiddenGemsPage = ({ onPageChange, addBookmark, isBookmarked, user }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedRegion, setSelectedRegion] = useState("all");
@@ -190,15 +191,13 @@ const HiddenGemsPage = ({ onPageChange, addBookmark, isBookmarked }) => {
   return (
     <div className="min-h-screen ">
       {/* Hero Header */}
-      <div
-        className="relative h-screen overflow-hidden flex items-center justify-center !bg-transparent"
-        style={{ background: "transparent" }}
-      >
+      <div className="relative h-screen overflow-hidden flex items-center justify-center !bg-transparent" style={{ background: 'transparent' }}>
+
         {/* Background Video */}
         <video
           className="absolute inset-0 w-full h-full object-cover"
           style={{ zIndex: 0 }}
-          src={ASSETS.HIDDEN_GEMS_VIDEO}
+          src={video}
           autoPlay
           loop
           muted
@@ -206,10 +205,7 @@ const HiddenGemsPage = ({ onPageChange, addBookmark, isBookmarked }) => {
         />
 
         {/* Dark Overlay for Better Text Readability */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/50 pointer-events-none"
-          style={{ zIndex: 1 }}
-        ></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/50 pointer-events-none" style={{ zIndex: 1 }}></div>
 
         <div className="relative z-10 text-center px-4">
           <motion.div
@@ -221,13 +217,13 @@ const HiddenGemsPage = ({ onPageChange, addBookmark, isBookmarked }) => {
               Hidden Gems of India
             </h1>
             <p className="text-xl md:text-2xl max-w-4xl mx-auto text-white font-medium drop-shadow leading-relaxed">
-              Discover India's best-kept secrets, off-the-beaten-path treasures,
-              <br />
+              Discover India's best-kept secrets, off-the-beaten-path treasures,<br />
               and lesser-known heritage sites waiting to be explored
             </p>
           </motion.div>
         </div>
       </div>
+
       <div className="container mx-auto px-4">
         {/* Submit Your Gem CTA */}
         <div className="mb-12 mt-12">
@@ -335,6 +331,10 @@ const HiddenGemsPage = ({ onPageChange, addBookmark, isBookmarked }) => {
                           e.stopPropagation();
                           addBookmark({ ...gem, type: "gem" });
                         }}
+                        className={`p-2 rounded-full backdrop-blur-sm transition-colors ${isBookmarked(gem.id, "gem")
+                            ? "bg-red-500 text-white"
+                            : "bg-white/20 text-white hover:bg-white/30"
+                          }`}
                       >
                         <Heart size={16} />
                       </button>

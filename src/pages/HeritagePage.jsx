@@ -15,21 +15,6 @@ import sanchi from "../assets/sanchi.jpg";
 import charminar from "../assets/charminar.jpeg";
 //imgbg
 import HeritageBg from "../assets/st3.webp";
-import tirupati from "../assets/tirupati.jpg";
-import nagarjunakonda from "../assets/nagarjunakonda.jpg";
-import lepakshi from "../assets/lepakshi1.jpg";
-import penusila from "../assets/penusila.avif";
-import chandragiri from "../assets/chandragiri.JPG";
-import gandikota from "../assets/gandikota.jpg";
-import golconda from "../assets/golconda.jpeg";
-import srirangam from "../assets/srirangam.webp";
-import meenakshi from "../assets/meenakshi.jpg";
-import brihadeeswarar from "../assets/brihadeeswarar.avif";
-import virupaksha from "../assets/virupaksha.webp";
-import mysore from "../assets/mysore.jpeg";
-import shoretemple from "../assets/shoretemple.jpg";
-import warangal from "../assets/warangal.jpg";
-import charminarMosque from "../assets/charminar_mosque.jpg";
 
 // ✅ Map JSON imageKey → actual image import
 const imageMap = {
@@ -43,21 +28,6 @@ const imageMap = {
   redFort,
   sanchi,
   charminar,
-  tirupati,
-  nagarjunakonda,
-  lepakshi,
-  penusila,
-  chandragiri,
-  gandikota,
-  golconda,
-  srirangam,
-  meenakshi,
-  brihadeeswarar,
-  virupaksha,
-  mysore,
-  shoretemple,
-  warangal,
-  charminarMosque,
 };
 
 const HeritagePage = () => {
@@ -110,14 +80,14 @@ const HeritagePage = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/70"></div>
 
         <div className="relative z-10 w-full flex flex-col items-center justify-center px-4 space-y-8">
+
           {/* Header - large and visible */}
           <header className="text-center">
-            <h1 className=" text-6xl md:text-8xl  font-heritage font-bold mb-4 text-transparent bg-gradient-to-r from-orange-400 via-orange-200 to-yellow-400 bg-clip-text drop-shadow-[0_3px_18px_rgba(0,0,0,0.6)] tracking-wide">
+            <h1 className=" text-6xl md:text-8xl font-extrabold font-heritage font-bold mb-4 text-transparent bg-gradient-to-r from-orange-400 via-orange-200 to-yellow-400 bg-clip-text drop-shadow-[0_3px_18px_rgba(0,0,0,0.6)] tracking-wide">
               Heritage of India
             </h1>
             <p className="text-2xl md:text-2xl max-w-2xl mx-auto text-white/90 font-semibold drop-shadow-md mb-6">
-              Discover the timeless monuments and cultural treasures of India
-              that showcase its glorious history and traditions.
+              Discover the timeless monuments and cultural treasures of India that showcase its glorious history and traditions.
             </p>
           </header>
         </div>
@@ -125,10 +95,10 @@ const HeritagePage = () => {
 
       {/* Filters */}
 
-      <div
-        className="w-full flex flex-col md:flex-row items-center justify-center gap-6
-  rounded-2xl bg-white/80 border border-white/30 shadow-lg px-8 py-7 mt-10"
-      >
+      <div className="w-full flex flex-col md:flex-row items-center justify-center gap-6
+  rounded-2xl bg-white/80 border border-white/30 shadow-lg px-8 py-7 mt-10">
+
+
         <div className="flex items-center gap-8 text-lg font-bold text-orange-700">
           <Filter className="w-6 h-6" />
           <span className="font-bold text-xl text-orange-800">Filters:</span>
@@ -141,9 +111,7 @@ const HeritagePage = () => {
           className="px-6 py-3 rounded-lg border-none focus:ring-2 focus:ring-orange-400 shadow focus:outline-none"
         >
           {states.map((state) => (
-            <option key={state} value={state}>
-              {state}
-            </option>
+            <option key={state} value={state}>{state}</option>
           ))}
         </select>
         {/* Rating Filter */}
@@ -157,10 +125,12 @@ const HeritagePage = () => {
           <option value="4.7">4.7 & above</option>
           <option value="4.9">4.9 only</option>
         </select>
+
       </div>
 
       {/* Main content BELOW the image banner */}
-      <main className="container mx-auto px-4 py-24">
+      <main className="container mx-auto px-4 py-24" >
+
         {/* ...other content below */}
         {/* Sites Grid */}
         <section

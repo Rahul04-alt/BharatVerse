@@ -10,7 +10,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { ritualDetailsData } from "../utils/ritualDetailsData";
-import { ASSETS } from "../constants/assets";
 
 const RitualExplorerPage = () => {
   const [selectedState, setSelectedState] = useState(null);
@@ -45,14 +44,14 @@ const RitualExplorerPage = () => {
           className="absolute inset-0 w-full h-full object-cover"
         >
           <source
-             src={ASSETS.RITUALS_VIDEO}
-            controls
+            src="/public/rituals3.mp4"
+            type="video/mp4"
           />
           
         </video>
 
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/40 to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
 
         {/* Animated Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-purple-900/30 via-transparent to-pink-900/30" />

@@ -130,25 +130,24 @@ const ArtsPage = ({ onPageChange, addBookmark, isBookmarked }) => {
           alt="Arts of India"
           className="absolute inset-0 w-full h-full object-cover object-center"
           draggable="false"
-          style={{ filter: "brightness(0.92)" }}
+          style={{ filter: 'brightness(0.92)' }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80 pointer-events-none"></div>
         <div className="relative z-10 w-full h-full flex flex-col items-center justify-center text-center px-4">
-          <h1
-            className="
+          <h1 className="
   text-6xl md:text-7xl font-heritage font-extrabold mb-4
-  bg-gradient-to-r from-pink-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent drop-shadow-[0_3px_18px_rgba(0,0,0,0.85)] tracking-wide"
-          >
+  bg-gradient-to-r from-pink-400 via-yellow-400 to-orange-500 bg-clip-text text-transparent drop-shadow-[0_3px_18px_rgba(0,0,0,0.85)] tracking-wide">
             Arts Of India
           </h1>
 
           <p className="mt-4 max-w-3xl mx-auto text-2xl md:text-3xl text-white font-medium drop-shadow leading-relaxed">
-            Discover India's rich artistic heritage through classical dances,
-            <br />
+            Discover India's rich artistic heritage through classical dances,<br />
             folk arts, traditional crafts, and timeless cultural expressions.
           </p>
         </div>
       </section>
+
+
 
       {/* Filters */}
       <main className="container mx-auto px-4 py-12">

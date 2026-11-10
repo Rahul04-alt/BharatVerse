@@ -1,25 +1,32 @@
-// src/pages/UploadPage.jsx
-
 import React, { useState, useRef } from "react";
 import {
   Upload,
   X,
+  Image,
   MapPin,
   Calendar,
   Type,
   Camera,
   Mic,
+  Globe,
   Star,
   CheckCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
 import { uploadFileToStorage, insertHeritageGem } from "../lib/supabaseClient";
-import { getSubmitterInfo } from "../services/mockUserService";
 
-const UploadPage = () => {
+// Mock user data for testing (use this in your parent component)
+export const mockUser = {
+  id: "550e8400-e29b-41d4-a716-446655440000", // Valid UUID format
+  name: "Heritage Explorer",
+  email: "explorer@bharatverse.com",
+};
+
+const UploadPage = ({ user, onSubmit, onCancel }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [previewMode, setPreviewMode] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -36,15 +43,17 @@ const UploadPage = () => {
     nearbyAttractions: [],
     tags: [],
     isHidden: false,
+    submitterInfo: {
+      name: user?.name || "",
+      email: user?.email || "",
+      canContact: true,
+    },
   });
-
   const [images, setImages] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
-
   const [audioRecording, setAudioRecording] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
-  const mediaRecorderRef = useRef(null);
 
   const steps = [
     {
@@ -157,8 +166,6 @@ const UploadPage = () => {
     "meditation",
   ];
 
-  // ----------------- helpers -----------------
-
   const handleInputChange = (field, value) => {
     if (field.includes(".")) {
       const [parent, child] = field.split(".");
@@ -186,6 +193,7 @@ const UploadPage = () => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
+
     const files = Array.from(e.dataTransfer.files);
     processFiles(files);
   };
@@ -193,11 +201,11 @@ const UploadPage = () => {
   const processFiles = (files) => {
     const validFiles = files.filter((file) => {
       if (!file.type.startsWith("image/")) {
-        alert(`${file.name} is not an image file`);
+        toast.error(`${file.name} is not an image file`);
         return false;
       }
       if (file.size > 10 * 1024 * 1024) {
-        alert(`${file.name} is too large (max 10MB)`);
+        toast.error(`${file.name} is too large (max 10MB)`);
         return false;
       }
       return true;
@@ -240,56 +248,51 @@ const UploadPage = () => {
             "coordinates.lng",
             position.coords.longitude.toFixed(6)
           );
-          alert("✅ Location detected!");
+          toast.success("Location detected!");
         },
         (error) => {
-          alert("❌ Failed to get location: " + error.message);
+          toast.error("Failed to get location: " + error.message);
         }
       );
     } else {
-      alert("❌ Geolocation not supported");
+      toast.error("Geolocation not supported");
     }
   };
 
-  const startAudioRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      const chunks = [];
-      const recordingStartTime = Date.now();
+  const startAudioRecording = () => {
+    if ("MediaRecorder" in window) {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          const mediaRecorder = new MediaRecorder(stream);
+          const chunks = [];
 
-      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "audio/webm" });
-        setAudioRecording({
-          blob,
-          url: URL.createObjectURL(blob),
-          duration: Date.now() - recordingStartTime,
+          mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: "audio/wav" });
+            setAudioRecording({
+              blob,
+              url: URL.createObjectURL(blob),
+              duration: Date.now() - recordingStartTime,
+            });
+          };
+
+          const recordingStartTime = Date.now();
+          mediaRecorder.start();
+          setIsRecording(true);
+
+          setTimeout(() => {
+            if (mediaRecorder.state === "recording") {
+              mediaRecorder.stop();
+              setIsRecording(false);
+              stream.getTracks().forEach((track) => track.stop());
+            }
+          }, 120000);
+        })
+        .catch((err) => {
+          toast.error("Could not access microphone");
+          console.error(err);
         });
-        stream.getTracks().forEach((track) => track.stop());
-        setIsRecording(false);
-      };
-
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start();
-      setIsRecording(true);
-
-      setTimeout(() => {
-        if (mediaRecorder.state === "recording") {
-          mediaRecorder.stop();
-          setIsRecording(false);
-        }
-      }, 120000);
-    } catch (error) {
-      alert("❌ Could not access microphone");
-      console.error(error);
-    }
-  };
-
-  const stopAudioRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
     }
   };
 
@@ -331,7 +334,7 @@ const UploadPage = () => {
     if (validateStep(currentStep)) {
       setCurrentStep((prev) => Math.min(prev + 1, steps.length));
     } else {
-      alert("⚠️ Please fill in all required fields");
+      toast.error("Please fill in all required fields");
     }
   };
 
@@ -339,32 +342,45 @@ const UploadPage = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
-  // ----------------- submit logic (mock user, no Clerk) -----------------
-
+  // UPDATED HANDLESUBMIT WITH PROPER UUID HANDLING
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) {
-      alert("⚠️ Please complete all required fields");
+      toast.error("Please complete all required fields");
+      return;
+    }
+
+    // Ensure user is authenticated
+    if (!user || !user.id) {
+      toast.error(
+        "You must be logged in to submit heritage gems. Please sign in and try again."
+      );
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      console.log("📤 Starting upload...");
+      // Start upload process
+      toast.loading("Starting upload...", { id: "upload" });
 
-      // STEP 1: upload images
+      // STEP 1: Upload all images
       const uploadedImages = [];
 
       for (let i = 0; i < images.length; i++) {
         const image = images[i];
+
+        // Create unique filename
         const timestamp = Date.now();
         const random = Math.random().toString(36).substring(2);
         const extension = image.file.name.split(".").pop();
-        const fileName = `images/mocked/${timestamp}-${random}.${extension}`;
+        const fileName = `images/${timestamp}-${random}.${extension}`;
 
         try {
-          console.log(`Uploading image ${i + 1}/${images.length}...`);
+          toast.loading(`Uploading image ${i + 1}/${images.length}...`, {
+            id: "upload",
+          });
 
+          // Upload to Supabase
           const result = await uploadFileToStorage(image.file, fileName);
 
           uploadedImages.push({
@@ -377,25 +393,27 @@ const UploadPage = () => {
             uploadedAt: new Date().toISOString(),
           });
 
-          console.log(`✅ Image ${i + 1} uploaded successfully`);
+          console.log(`Successfully uploaded image ${i + 1}:`, result);
         } catch (error) {
-          console.error(`❌ Failed to upload ${image.file.name}:`, error);
-          alert(`Failed to upload ${image.file.name}`);
+          console.error(`Failed to upload ${image.file.name}:`, error);
+          toast.error(`Failed to upload ${image.file.name}: ${error.message}`);
         }
       }
 
+      // Check if at least one image uploaded
       if (uploadedImages.length === 0) {
         throw new Error("No images uploaded successfully");
       }
 
-      // STEP 2: upload audio (optional)
+      // STEP 2: Upload audio (if exists)
       let audioUrl = null;
       if (audioRecording && audioRecording.blob) {
         try {
-          console.log("Uploading audio...");
+          toast.loading("Uploading audio...", { id: "upload" });
+
           const timestamp = Date.now();
           const random = Math.random().toString(36).substring(2);
-          const audioFileName = `audio/mocked/${timestamp}-${random}.webm`;
+          const audioFileName = `audio/${timestamp}-${random}.wav`;
 
           const audioResult = await uploadFileToStorage(
             audioRecording.blob,
@@ -403,16 +421,15 @@ const UploadPage = () => {
           );
           audioUrl = audioResult.url;
 
-          console.log("✅ Audio uploaded successfully");
+          console.log("Audio recording uploaded successfully:", audioResult);
         } catch (error) {
-          console.error("❌ Audio upload failed:", error);
+          console.error("Audio upload failed:", error);
+          toast.error("Audio upload failed but continuing with submission");
         }
       }
 
-      // STEP 3: insert into hidden_gems via Supabase
-      console.log("Saving to database...");
-
-      const tagsArray = formData.tags || [];
+      // STEP 3: Save to database
+      toast.loading("Saving to database...", { id: "upload" });
 
       const submissionData = {
         title: formData.title.trim(),
@@ -435,22 +452,35 @@ const UploadPage = () => {
         accessibility: formData.accessibility.trim() || null,
         local_tips: formData.localTips.trim() || null,
         nearby_attractions: formData.nearbyAttractions || [],
-        tags: tagsArray,
+        tags: formData.tags || [],
         is_hidden: formData.isHidden,
-        submitter_info: getSubmitterInfo(), // ✅ MOCK USER INFO
-        submitter_id: null, // ✅ always null
+        submitter_info: {
+          name: formData.submitterInfo.name || user.name || "",
+          email: formData.submitterInfo.email || user.email || "",
+          canContact: formData.submitterInfo.canContact,
+        },
+        submitter_id: user.id, // Use UUID string directly
         images: uploadedImages,
         audio_url: audioUrl,
         submitted_at: new Date().toISOString(),
         status: "pending_review",
       };
 
+      console.log("Prepared submission data:", submissionData);
+      console.log("User ID being used:", user.id);
+
+      // Insert into database
       const result = await insertHeritageGem(submissionData);
 
-      console.log("✅ Successfully submitted heritage gem:", result);
-      alert(`🎉 "${formData.title}" submitted for review!`);
+      console.log("Successfully submitted heritage gem:", result);
 
-      // reset
+      // Success!
+      toast.success(`🎉 "${formData.title}" submitted for review!`, {
+        id: "upload",
+        duration: 5000,
+      });
+
+      // Reset form
       setFormData({
         title: "",
         description: "",
@@ -467,19 +497,53 @@ const UploadPage = () => {
         nearbyAttractions: [],
         tags: [],
         isHidden: false,
+        submitterInfo: {
+          name: user?.name || "",
+          email: user?.email || "",
+          canContact: true,
+        },
       });
+
       setImages([]);
       setAudioRecording(null);
       setCurrentStep(1);
+
+      // Call original onSubmit if exists
+      if (onSubmit) {
+        await onSubmit(result);
+      }
     } catch (error) {
-      console.error("❌ Submission error:", error);
-      alert("❌ Upload failed. Please try again.\n\nError: " + error.message);
+      console.error("Submission error:", error);
+
+      let errorMessage = "Upload failed. Please try again.";
+      if (
+        error.message.includes("new row violates row-level security policy")
+      ) {
+        errorMessage =
+          "Database permission error. Please ensure you're properly logged in and try again.";
+      } else if (error.message.includes("invalid input syntax for type uuid")) {
+        errorMessage = "Invalid user ID format. Please refresh and try again.";
+      } else if (
+        error.message.includes("network") ||
+        error.message.includes("fetch")
+      ) {
+        errorMessage = "Network error. Check your internet connection.";
+      } else if (error.message.includes("storage")) {
+        errorMessage = "File upload failed. Check file sizes and try again.";
+      } else if (
+        error.message.includes("database") ||
+        error.message.includes("insert")
+      ) {
+        errorMessage = "Database error. Please try again or contact support.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      toast.error(errorMessage, { id: "upload", duration: 6000 });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  // ----------------- render steps -----------------
 
   const renderStep = () => {
     switch (currentStep) {
@@ -495,7 +559,7 @@ const UploadPage = () => {
                 value={formData.title}
                 onChange={(e) => handleInputChange("title", e.target.value)}
                 placeholder="Name of the heritage site or tradition"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none"
                 required
               />
             </div>
@@ -507,7 +571,7 @@ const UploadPage = () => {
               <select
                 value={formData.category}
                 onChange={(e) => handleInputChange("category", e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none"
                 required
               >
                 <option value="">Select category</option>
@@ -528,8 +592,8 @@ const UploadPage = () => {
                 onChange={(e) =>
                   handleInputChange("description", e.target.value)
                 }
-                placeholder="Detailed description of the heritage site"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none h-32 resize-none"
+                placeholder="Detailed description of the heritage site, its history, and significance"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none h-32 resize-none"
                 required
               />
               <p className="text-sm text-gray-500 mt-1">
@@ -545,7 +609,7 @@ const UploadPage = () => {
                 onChange={(e) =>
                   handleInputChange("isHidden", e.target.checked)
                 }
-                className="rounded border-gray-300"
+                className="rounded border-gray-300 text-saffron-600 focus:ring-saffron-500"
               />
               <label htmlFor="hidden" className="text-sm text-gray-700">
                 This is a hidden/lesser-known heritage site
@@ -565,7 +629,7 @@ const UploadPage = () => {
                 <select
                   value={formData.state}
                   onChange={(e) => handleInputChange("state", e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none"
                   required
                 >
                   <option value="">Select state</option>
@@ -586,7 +650,7 @@ const UploadPage = () => {
                   value={formData.city}
                   onChange={(e) => handleInputChange("city", e.target.value)}
                   placeholder="Nearest city or district"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none"
                   required
                 />
               </div>
@@ -604,7 +668,7 @@ const UploadPage = () => {
                     handleInputChange("coordinates.lat", e.target.value)
                   }
                   placeholder="Latitude"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none"
                   step="any"
                 />
               </div>
@@ -620,7 +684,7 @@ const UploadPage = () => {
                     handleInputChange("coordinates.lng", e.target.value)
                   }
                   placeholder="Longitude"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none"
                   step="any"
                 />
               </div>
@@ -646,7 +710,7 @@ const UploadPage = () => {
                   handleInputChange("howToReach", e.target.value)
                 }
                 placeholder="Detailed directions on how to reach this place"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none h-24 resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none h-24 resize-none"
               />
             </div>
           </div>
@@ -655,6 +719,7 @@ const UploadPage = () => {
       case 3:
         return (
           <div className="space-y-6">
+            {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-4">
                 Photos * (Max 8 images, 10MB each)
@@ -663,8 +728,8 @@ const UploadPage = () => {
               <div
                 className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer ${
                   dragActive
-                    ? "border-orange-500 bg-orange-50"
-                    : "border-gray-300 hover:border-orange-400"
+                    ? "border-saffron-500 bg-saffron-50"
+                    : "border-gray-300 hover:border-saffron-400"
                 }`}
                 onDragEnter={(e) => {
                   e.preventDefault();
@@ -686,7 +751,7 @@ const UploadPage = () => {
                   Drag & drop images or click to browse
                 </p>
                 <p className="text-sm text-gray-600">
-                  High-quality images showcase the heritage site better
+                  High-quality images help showcase the heritage site better
                 </p>
 
                 <input
@@ -699,6 +764,7 @@ const UploadPage = () => {
                 />
               </div>
 
+              {/* Image Previews */}
               {images.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                   {images.map((image) => (
@@ -714,24 +780,31 @@ const UploadPage = () => {
                       >
                         ×
                       </button>
+                      <input
+                        type="text"
+                        placeholder="Add caption..."
+                        value={image.caption}
+                        onChange={(e) =>
+                          updateImageCaption(image.id, e.target.value)
+                        }
+                        className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 opacity-0 group-hover:opacity-100 transition-opacity rounded-b-lg"
+                      />
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
+            {/* Audio Recording */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-4">
                 Audio Story (Optional)
               </label>
+
               <div className="bg-gray-50 rounded-xl p-6 text-center">
                 {audioRecording ? (
                   <div>
-                    <audio
-                      controls
-                      src={audioRecording.url}
-                      className="w-full mb-4"
-                    />
+                    <audio controls src={audioRecording.url} className="mb-4" />
                     <div className="flex items-center justify-center space-x-4">
                       <button
                         onClick={() => setAudioRecording(null)}
@@ -745,28 +818,21 @@ const UploadPage = () => {
                   <div>
                     <Mic size={32} className="text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600 mb-4">
-                      Record a personal story about this place
+                      Record a personal story or description about this place
                     </p>
-                    {isRecording ? (
-                      <button
-                        onClick={stopAudioRecording}
-                        className="px-6 py-3 rounded-xl font-semibold bg-red-500 text-white hover:bg-red-600 transition-colors"
-                      >
-                        Stop Recording
-                      </button>
-                    ) : (
-                      <button
-                        onClick={startAudioRecording}
-                        className="px-6 py-3 rounded-xl font-semibold bg-orange-500 text-white hover:bg-orange-600 transition-colors"
-                      >
-                        Start Recording
-                      </button>
-                    )}
-                    {isRecording && (
-                      <p className="text-red-600 mt-2 font-semibold">
-                        Recording... (Max 2 min)
-                      </p>
-                    )}
+                    <button
+                      onClick={startAudioRecording}
+                      disabled={isRecording}
+                      className={`px-6 py-3 rounded-xl font-semibold transition-colors ${
+                        isRecording
+                          ? "bg-red-500 text-white cursor-not-allowed"
+                          : "bg-saffron-500 text-white hover:bg-saffron-600"
+                      }`}
+                    >
+                      {isRecording
+                        ? "Recording... (Max 2 min)"
+                        : "Start Recording"}
+                    </button>
                   </div>
                 )}
               </div>
@@ -786,8 +852,8 @@ const UploadPage = () => {
                 onChange={(e) =>
                   handleInputChange("culturalSignificance", e.target.value)
                 }
-                placeholder="Explain the cultural, historical, or spiritual importance"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none h-32 resize-none"
+                placeholder="Explain the cultural, historical, or spiritual importance of this place"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none h-32 resize-none"
                 required
               />
             </div>
@@ -803,7 +869,7 @@ const UploadPage = () => {
                   onChange={(e) =>
                     handleInputChange("visitDate", e.target.value)
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none"
                 />
               </div>
 
@@ -818,7 +884,7 @@ const UploadPage = () => {
                     handleInputChange("bestTimeToVisit", e.target.value)
                   }
                   placeholder="e.g., October to March"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none"
                 />
               </div>
             </div>
@@ -830,8 +896,8 @@ const UploadPage = () => {
               <textarea
                 value={formData.localTips}
                 onChange={(e) => handleInputChange("localTips", e.target.value)}
-                placeholder="Share helpful tips for other visitors"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none h-24 resize-none"
+                placeholder="Share helpful tips for other visitors - what to bring, who to contact, etc."
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-saffron-500 focus:border-transparent outline-none h-24 resize-none"
               />
             </div>
 
@@ -843,12 +909,12 @@ const UploadPage = () => {
                 {formData.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="inline-flex items-center space-x-1 bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm"
+                    className="inline-flex items-center space-x-1 bg-saffron-100 text-saffron-800 px-3 py-1 rounded-full text-sm"
                   >
                     <span>{tag}</span>
                     <button
                       onClick={() => removeTag(tag)}
-                      className="text-orange-600 hover:text-orange-800"
+                      className="text-saffron-600 hover:text-saffron-800 ml-1"
                     >
                       ×
                     </button>
@@ -864,7 +930,7 @@ const UploadPage = () => {
                     <button
                       key={tag}
                       onClick={() => addTag(tag)}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-orange-100 hover:text-orange-800 transition-colors"
+                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-saffron-100 hover:text-saffron-800 transition-colors"
                     >
                       + {tag}
                     </button>
@@ -922,7 +988,7 @@ const UploadPage = () => {
                   {formData.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs"
+                      className="bg-saffron-100 text-saffron-800 px-2 py-1 rounded-full text-xs"
                     >
                       {tag}
                     </span>
@@ -934,16 +1000,30 @@ const UploadPage = () => {
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <p className="text-sm text-blue-700">
                 <strong>Important:</strong> Your submission will be reviewed by
-                our team before publishing. Thank you for contributing to
-                India's heritage preservation!
+                our team before publishing. We may contact you for additional
+                information. Thank you for contributing to India's heritage
+                preservation!
               </p>
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-              <p className="text-sm text-green-700">
-                Submitting as: anonymous contributor (mock user)
-              </p>
-            </div>
+            {/* Show user info */}
+            {user && user.id && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <p className="text-sm text-green-700">
+                  <strong>Submitting as:</strong> {user.name} ({user.email})
+                </p>
+              </div>
+            )}
+
+            {/* Show authentication warning if not logged in */}
+            {(!user || !user.id) && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <p className="text-sm text-red-700">
+                  <strong>Authentication Required:</strong> You must be logged
+                  in to submit heritage gems. Please sign in before submitting.
+                </p>
+              </div>
+            )}
           </div>
         );
 
@@ -952,30 +1032,30 @@ const UploadPage = () => {
     }
   };
 
-  // ----------------- main render -----------------
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
+        {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-heritage font-bold heritage-text-gradient mb-4">
             Share a Hidden Heritage Gem
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Help preserve India's cultural heritage by sharing lesser-known
-            sites and traditions from your region. No login required.
+            sites, traditions, or cultural practices from your region.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-          <div className="flex items-center justify-between overflow-x-auto">
+        {/* Progress Steps */}
+        <div className="heritage-card p-6 mb-8">
+          <div className="flex items-center justify-between">
             {steps.map((step, index) => (
               <React.Fragment key={step.id}>
-                <div className="flex flex-col items-center flex-shrink-0">
+                <div className="flex flex-col items-center">
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${
                       currentStep >= step.id
-                        ? "bg-orange-500 text-white"
+                        ? "bg-saffron-500 text-white"
                         : "bg-gray-200 text-gray-500"
                     }`}
                   >
@@ -989,11 +1069,14 @@ const UploadPage = () => {
                     <div
                       className={`font-semibold text-sm ${
                         currentStep >= step.id
-                          ? "text-orange-600"
+                          ? "text-saffron-600"
                           : "text-gray-500"
                       }`}
                     >
                       {step.title}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {step.description}
                     </div>
                   </div>
                 </div>
@@ -1001,7 +1084,7 @@ const UploadPage = () => {
                 {index < steps.length - 1 && (
                   <div
                     className={`flex-1 h-1 mx-4 transition-all duration-300 ${
-                      currentStep > step.id ? "bg-orange-500" : "bg-gray-200"
+                      currentStep > step.id ? "bg-saffron-500" : "bg-gray-200"
                     }`}
                   />
                 )}
@@ -1010,7 +1093,8 @@ const UploadPage = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        {/* Form Content */}
+        <div className="heritage-card p-8 mb-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
@@ -1024,6 +1108,7 @@ const UploadPage = () => {
           </AnimatePresence>
         </div>
 
+        {/* Navigation Buttons */}
         <div className="flex items-center justify-between">
           <div>
             {currentStep > 1 && (
@@ -1037,23 +1122,42 @@ const UploadPage = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            {currentStep < steps.length ? (
+            {onCancel && (
               <button
-                onClick={nextStep}
-                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold rounded-xl hover:shadow-lg transition"
+                onClick={onCancel}
+                className="px-6 py-3 text-gray-600 hover:text-gray-800 transition-colors"
               >
+                Cancel
+              </button>
+            )}
+
+            {currentStep < steps.length ? (
+              <button onClick={nextStep} className="btn-heritage px-6 py-3">
                 Continue →
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="px-8 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold rounded-xl hover:shadow-lg transition disabled:opacity-50"
+                disabled={isSubmitting || !user || !user.id}
+                className="btn-heritage px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Submitting..." : "Submit for Review"}
               </button>
             )}
           </div>
+        </div>
+
+        {/* Help Text */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-gray-500">
+            Need help? Contact us at{" "}
+            <a
+              href="mailto:support@bharatverse.com"
+              className="text-saffron-600 hover:text-saffron-700"
+            >
+              support@bharatverse.com
+            </a>
+          </p>
         </div>
       </div>
     </div>

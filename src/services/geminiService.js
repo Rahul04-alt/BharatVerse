@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
 import toast from "react-hot-toast";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
@@ -157,12 +158,14 @@ Generate NOW:
     toast.dismiss();
     toast.success("✨ Itinerary generated successfully!");
     return itinerary;
-  } catch (error) {
-    console.error("Gemini Error:", error);
-    toast.dismiss();
-    toast.error("❌ Failed to generate itinerary. Check API key & internet.");
-    throw error;
-  }
+  }  catch (error) {
+  console.error("Gemini Error:", error);
+  toast.dismiss();
+  toast.error("❌ Failed to generate itinerary. Check API key & internet.");
+  throw error;
+}
+
+
 }
 
 function calculateHours(startTime, endTime) {

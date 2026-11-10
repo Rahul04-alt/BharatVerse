@@ -22,8 +22,6 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ASSETS } from "../constants/assets";
-
 
 const TourPage360 = ({ onPageChange }) => {
   const [activeLocation, setActiveLocation] = useState(0);
@@ -176,21 +174,7 @@ const TourPage360 = ({ onPageChange }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Hero Section */}
-      <section className="relative py-20 text-white overflow-hidden min-h-screen flex items-center justify-center">
-        {/* Video Background */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src={ASSETS.TOUR_360_VIDEO} controls />
-        </video>
-
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/30"></div>
-
+      <section className="relative py-20 bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white overflow-hidden">
         <div className="container mx-auto px-4 text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -480,7 +464,7 @@ const TourPage360 = ({ onPageChange }) => {
       </div>
 
       {/* Call to Action */}
-      <section className="py-20 text-white bg-gradient-to-br from-slate-900 via-purple-900 to-black">
+      <section className="py-20 bg-gradient-to-r from-gray-900 to-black text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-5xl font-heritage font-bold mb-8">
             Ready for More Adventures?

@@ -1,253 +1,118 @@
-# BharatVerse 🇮🇳
-
-> **Explore India's Heritage, Culture & Hidden Gems — All in One Place**
-
-BharatVerse is a feature-rich, full-stack React web application that brings India's cultural tapestry to life. Powered by Google Gemini AI and backed by Supabase, it combines interactive maps, immersive 360° tours, AI storytelling, and intelligent travel planning into a single platform for every culture enthusiast and explorer.
+# 🇮🇳 BharatVerse — A Heritage & Cultural Experience Platform  
+---
+# PS : SIH25130
+## Student Innovation : Swadeshi for Atmanirbhar Bharat - Heritage & Culture
 
 ---
 
-## 🌟 Live Demo
+## Team Details  
 
-🔗 [Visit BharatVerse](https://github.com/Rahul04-alt/BharatVerse)
+**Team Name:** Netaji Ninjas 
 
----
+**Team Leader:** Aryan  
 
-## ✨ Features
-
-### 🗺️ Interactive India Map
-- Leaflet-powered map with **Street, Satellite, and Terrain** base layers
-- Custom emoji markers — 🏛️ Heritage Sites · 💎 Hidden Gems · 🛕 Temples
-- Filter by **region** (North, South, East, West, Northeast, Central) and **type**
-- **Search** places by name or state with live results
-- **Smart route planner** using nearest-neighbor optimization
-- One-click **"Navigate Route"** via Google Maps with live GPS start
-- Add/remove stops, clear entire route dynamically
-
-### 🤖 Gemini AI — Itinerary Planner
-- Generate **personalized day-by-day travel itineraries** using Gemini 2.5 Flash
-- Picks the perfect Indian state based on trip duration, season, and preferences
-- **"Any State" mode** — AI randomly recommends a suitable destination each time
-- Seasonal intelligence — summer hill stations, monsoon Northeast, winter deserts
-- Displays structured daily schedule with timings, activities, and food stops
-
-### 💬 AI Chatbot
-- Conversational chatbot powered by **Google Gemini**
-- Ask anything about Indian history, culture, food, travel tips, festivals
-- Context-aware responses tailored to Indian heritage topics
-
-### 📖 AI Storytelling
-- 55+ curated cultural stories narrated via **AI-generated audio** (Gradio + HuggingFace)
-- Custom audio player with play, pause, and replay controls
-- Rich story images for every tale — mythology, history, folk stories
-
-### 🏛️ Heritage Explorer
-- Browse **UNESCO and national heritage sites** across all states
-- Detailed pages with history, architecture, visiting hours, entry fees
-- Photo galleries and related heritage recommendations
-
-### 🎭 Festivals of India
-- Explore India's diverse festivals with **rich media content**
-- State-wise and season-wise festival discovery
-- Cultural significance, traditions, and celebration details
-
-### 🎨 Arts & Crafts
-- Discover **traditional art forms** state by state — Madhubani, Warli, Pattachitra, Kathak and more
-- Artist profiles, technique descriptions, and cultural background
-
-### 💎 Hidden Gems
-- **Off-the-beaten-path** destinations curated across India
-- Places like Dhanushkodi, Living Root Bridges, and more unexplored wonders
-- Rating, visitor counts, and travel tips
-
-### 🔮 Ritual Explorer
-- Deep-dive into India's **ancient rituals and traditions**
-- Detailed descriptions, significance, and regional variations
-
-### 🌐 360° Virtual Tours
-- Immersive **panoramic viewer** for heritage sites using custom PanoViewer
-- Drag-to-explore experience right in the browser
-
-### 🎵 Global Music Player
-- Persistent **ambient Indian folk and classical music** player across all pages
-- Non-intrusive floating player with play/pause controls
-
-### 🧠 Cultural Quiz
-- Multi-category quiz on **Indian history, geography, culture, and festivals**
-- Real-time scoring with progress tracking
-- **Badge system** — Bronze 🥉, Silver 🥈, Gold 🥇, Perfect Score ⭐ based on performance
-- Leaderboard powered by Supabase
-
-### 🔍 Smart Recommendations
-- **NLP-powered recommendation engine** (HuggingFace Space backend)
-- Type a place, mood, or activity and get personalized Indian destination suggestions
-- Save favorites to a personal collection
-
-### 👤 User Account & Profile
-- Authentication via **Clerk** (Sign up, Sign in, Social login)
-- Personal dashboard with bookmarks, quiz stats, and badges
-- Progress tracking across the entire platform
-- Review and **star-rating system** for heritage sites and hidden gems
-
-### 📤 Community Uploads
-- Upload your own **travel photos and stories**
-- Share hidden gems and local experiences with the community
-- Cloudinary-powered image hosting
+**Team Members:**  
+- MEMBER_1 - 2023UCB6021 - <a href="https://github.com/Aryan-s16" > Aryan</a>
+- MEMBER_2 - 2023UCB6034 - <a href="https://github.com/garvbahl37-gif" >Garv Bahl</a>
+- MEMBER_3 - 2023UCB6038 - <a href="https://github.com/Rahul04-alt" >Rahul</a>
+- MEMBER_4 - 2023UCB6036 - <a href="https://github.com/kumardhruv88" >Dhruv Kumar</a>
+- MEMBER_5 - 2023UCB2839 - <a href="https://github.com/lucky15426" >Lucky Kumar Gupta</a>
+- MEMBER_6 - 2023UCB6057 - <a href="https://github.com/mehaksts2106" >Mehak</a>
 
 ---
 
-## 🧱 Tech Stack
+## 🔗 Project Links  
 
-| Category | Technologies |
-|----------|-------------|
-| **Frontend** | React 18, React Router v7, Tailwind CSS, Framer Motion |
-| **AI / ML** | Google Gemini 2.5 Flash API, Gradio Client (HuggingFace) |
-| **Auth** | Clerk (`@clerk/clerk-react`) |
-| **Database & Storage** | Supabase (PostgreSQL + File Storage) |
-| **Maps** | Leaflet, React-Leaflet |
-| **State Management** | Zustand, React Query |
-| **Forms** | React Hook Form |
-| **UI Components** | Lucide React, React Icons, React Hot Toast |
-| **Animations** | Framer Motion |
-| **Build Tooling** | Vite, ESLint, PostCSS, Autoprefixer |
+- 📑 **SIH Presentation** → [Final SIH Presentation](https://github.com/Aryan-s16/BharatVerse/blob/9348970dc96d8693e28f7d743984355f71f54937/SIH-%20Presentation.pdf)  
+- 🎥 **Video Demonstration** → [Watch Video](https://youtu.be/5OqhOkwkqTs)  
+- 🚀 **Live Deployment** → [View Deployment](https://bharat-verse-theta.vercel.app)  
+- 💻 **Source Code** → [GitHub Repository](https://github.com/Aryan-s16/BharatVerse.git)  
 
 ---
 
-## 🚀 Getting Started
+## 🌟 Key Features  
 
-### Prerequisites
-- Node.js v18+
-- npm v9+
+- **💠 Hidden Gems (Community Contributions)**
+  - Discover lesser-known cultural spots (temples, caves, villages, art hubs)
+  - Users can upload images, descriptions, and locations to enrich the digital heritage map
+  - Boosts *local tourism* and attracts visitors to unexplored destinations
+  - Supports local artisans, preserves traditions, and boosts local economy & employment
+  - Verified by experts at the backend to ensure authenticity and credibility
+  
 
-### 1. Clone the repository
+- **🤖 AI-Powered Cultural Guide**
+  - Human-like AI capable of natural language understanding
+  - Users can type or speak questions (e.g., "Tell me about the Ajanta Caves")
+  - Provides instant insights, cultural recommendations, and explanations
+  - Makes cultural exploration interactive, intuitive, and personalized
 
+- **😍 360° Virtual Tour & Cultural Immersion**
+  - Immersive 3D tours of iconic sites: Taj Mahal,beaches, forts, palaces
+  - Interactive navigation: move around, zoom, and explore multiple viewpoints
+  - Educational context: learn history, architecture, and cultural significance during tours
+
+- **🏆 Cultural Quiz (Gamified Learning)**
+  - Interactive quizzes on monuments, festivals, art, history, and hidden gems
+  - Gamified experience with points, leaderboard, and achievements
+  - Makes learning fun, competitive, and memorable
+  - Encourages knowledge retention while exploring culture
+- **🗺️ Interactive Map Feature**
+  - Offers three views: Satellite, Street, and Terrain
+  - Can be used for route planning across India
+  - Locate major heritage sites, states, and cities
+  - Helps users explore and navigate India’s cultural landscape
+- **🪕 Cultural Arts & Living Traditions**
+  - Explore India’s diverse cultural arts: paintings (Madhubani, Pattachitra, Warli, Tanjore), dance forms, folk dresses, martial arts, and more
+  - Learn history, techniques, and cultural significance
+  - Encourages appreciation of living traditions
+
+- **🏛 Heritage Explorer**
+  - Browse India’s ancient temples, forts, palaces, and UNESCO sites
+  - Learn about history, architecture, and cultural significance
+
+
+- **🎉 Festivals of India**
+  - Explore origins, rituals, and traditions of India’s vibrant festivals.
+  - Celebrate diversity through interactive storytelling and visuals.
+
+- **📚 LEAD Program (Learn, Explore, Archive, Develop)**
+  - Promotes cultural literacy across India
+  - Encourages learning about history, traditions, and heritage
+  - Supports exploration, documentation, and preservation of cultural practices
+  - Helps users develop knowledge and appreciation of India’s diverse heritage
+
+
+
+---
+
+##  Tech Stack  
+
+- **Frontend:** React.js, React Native, TailwindCSS, HTML, CSS, JavaScript  
+- **Backend:** Node.js, Express.js, MongoDB  
+- **AI & Smart Features:** Gemini APIs for cultural recommendations  
+- **AR/VR & 3D Tours:** WebRTC, 3D Virtual Tour modules
+
+--- 
+
+## 🚀 Getting Started (Run Locally)  
+
+1️⃣ **Clone the Repository**  
 ```bash
-git clone https://github.com/Rahul04-alt/BharatVerse.git
-cd BharatVerse
+git clone https://github.com/Aryan-s16/BharatVerse.git
+cd bharatverse
 ```
-
-### 2. Install dependencies
-
+2️⃣ Install Dependencies
 ```bash
 npm install
 ```
-
-### 3. Set up environment variables
-
-Create a `.env.local` file in the root directory:
-
-```env
-# Authentication (Required — app won't start without this)
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
-
-# Supabase — database, auth & storage (Required)
-VITE_SUPABASE_URL=https://xxxx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJ...
-VITE_SUPABASE_SERVICE_ROLE_KEY=eyJ...
-
-# Google Gemini AI — itinerary planner & chatbot (Required for AI features)
-VITE_GEMINI_API_KEY=AIza...
-
-# Optional — features degrade gracefully without these
-VITE_GOOGLE_MAPS_KEY=AIza...      # Map navigation
-VITE_YOUTUBE_KEY=AIza...          # YouTube video embeds
-VITE_WEATHER_KEY=...              # Weather info
-VITE_AI_API_URL=http://localhost:8000  # Local AI backend (defaults to localhost)
-```
-
-| Key | Where to get it |
-|-----|----------------|
-| `VITE_CLERK_PUBLISHABLE_KEY` | [clerk.com](https://clerk.com) → Dashboard → API Keys |
-| `VITE_SUPABASE_URL` & keys | [supabase.com](https://supabase.com) → Project Settings → API |
-| `VITE_GEMINI_API_KEY` | [aistudio.google.com](https://aistudio.google.com) → Get API Key |
-| `VITE_GOOGLE_MAPS_KEY` | [console.cloud.google.com](https://console.cloud.google.com) → Maps JavaScript API |
-
-### 4. Run the development server
-
+3️⃣ Run Development Server
 ```bash
 npm run dev
 ```
-
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
-### 5. Build for production
-
+4️⃣ Access the Application
 ```bash
-npm run build
-npm run preview   # preview the production build locally
+👉 Open the designated port for localhost in your browser.
 ```
-
----
-
-## 📁 Project Structure
-
-```
-BharatVerse/
-├── public/
-│   ├── manifest.json        # PWA manifest
-│   └── sw.js                # Service worker
-└── src/
-    ├── assets/              # Images, videos, and static media
-    ├── components/          # Reusable UI components
-    │   ├── AudioPlayer.jsx
-    │   ├── ChatBot.jsx
-    │   ├── GlobalMusicPlayer.jsx
-    │   ├── GeminiItineraryForm.jsx
-    │   ├── PanoViewer.jsx
-    │   ├── Quiz.jsx
-    │   ├── ReviewSystem.jsx
-    │   └── ...
-    ├── constants/           # App-wide constants and asset maps
-    ├── contexts/            # React context (AppContext)
-    ├── data/                # Static JSON — states, festivals, heritage, arts, quiz
-    ├── hooks/               # Custom hooks (auth, bookmarks, search, geolocation)
-    ├── lib/                 # Supabase client setup
-    ├── pages/               # Full page components (17 pages)
-    │   ├── HomePage.jsx
-    │   ├── MapPage.jsx
-    │   ├── HeritagePage.jsx
-    │   ├── ItineraryPlanner.jsx
-    │   ├── StoryTellingPage.jsx
-    │   ├── RecommendationsPage.jsx
-    │   └── ...
-    ├── services/            # API, Gemini, quiz, badge, bookmark services
-    └── utils/               # Helpers, validators, itinerary calculator
-```
-
----
-
-## 📜 Available Scripts
-
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server on port 5173 |
-| `npm run build` | Build optimized production bundle |
-| `npm run preview` | Preview production build locally |
-| `npm run lint` | Run ESLint across the codebase |
-
----
-
-## 📱 PWA Support
-
-BharatVerse is a **Progressive Web App** — install it on your phone or desktop directly from the browser for an app-like experience with offline support via service worker.
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome! For major changes, please open an issue first to discuss what you'd like to change.
-
-1. Fork the repo
-2. Create your feature branch: `git checkout -b feat/amazing-feature`
-3. Commit your changes: `git commit -m "feat: add amazing feature"`
-4. Push to the branch: `git push origin feat/amazing-feature`
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-<p align="center">Made with ❤️ for India's incredible culture and heritage</p>
+## 🎯 Vision
+BharatVerse is more than a project — it’s a digital movement to preserve, promote, and experience India’s timeless heritage.
+By blending AI, AR/VR, gamification, and community contributions, it connects people with India’s history, art, and culture while empowering local artisans and tourism.

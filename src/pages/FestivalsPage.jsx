@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Calendar, Star, Clock, Heart, Share2, Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import festivalsData from "../data/festivals.json";
-import { ASSETS } from "../constants/assets";
 
 // Import images
 import diwaliImg from "../assets/diwali.jpeg";
@@ -144,34 +143,33 @@ const FestivalsPage = ({ addBookmark, isBookmarked }) => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero */}
-      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Video */}
-        <video
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ zIndex: 0 }}
-          src={ASSETS.FESTIVALS_BG_VIDEO}
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-        {/* Overlay for readability */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60 pointer-events-none"
-          style={{ zIndex: 1 }}
-        ></div>
-        {/* Content */}
-        <div className="text-center px-4 relative" style={{ zIndex: 2 }}>
-          <h1 className="text-5xl md:text-6xl font-heritage font-bold text-white drop-shadow-lg mb-6">
-            Indian Festivals
-          </h1>
-          <p className="text-lg md:text-2xl max-w-3xl mx-auto text-white/90 drop-shadow-md font-medium">
-            Experience the vibrant colors, traditions, and celebrations of
-            India’s diverse cultural heritage
-          </p>
-        </div>
-      </div>
+  {/* Hero */}
+  <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+
+    {/* Background Video */}
+    <video
+      className="absolute inset-0 w-full h-full object-cover"
+      style={{ zIndex: 0 }}
+      src="/FV.3.mp4"
+      autoPlay
+      loop
+      muted
+      playsInline
+    />
+    {/* Overlay for readability */}
+    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60 pointer-events-none" style={{ zIndex: 1 }}></div>
+    {/* Content */}
+    <div className="text-center px-4 relative" style={{ zIndex: 2 }}>
+      <h1 className="text-5xl md:text-6xl font-heritage font-bold text-white drop-shadow-lg mb-6">
+        Indian Festivals
+      </h1>
+      <p className="text-lg md:text-2xl max-w-3xl mx-auto text-white/90 drop-shadow-md font-medium">
+        Experience the vibrant colors, traditions, and celebrations of
+        India’s diverse cultural heritage
+      </p>
+    </div>
+  </div>
+
 
       {/* Filters */}
       <div className="max-w-7xl mx-auto px-4 py-8">
