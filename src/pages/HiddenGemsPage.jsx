@@ -65,7 +65,12 @@ const imageMap = {
   "kolukkumalai.jpg": kolukkumalaiImg,
 };
 
-const HiddenGemsPage = ({ onPageChange, addBookmark, isBookmarked, user }) => {
+const HiddenGemsPage = ({
+  onPageChange,
+  addBookmark = () => { },
+  isBookmarked = () => false,
+  user,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedRegion, setSelectedRegion] = useState("all");
@@ -329,9 +334,9 @@ const HiddenGemsPage = ({ onPageChange, addBookmark, isBookmarked, user }) => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          addBookmark({ ...gem, type: "gem" });
+                          addBookmark?.({ ...gem, type: "gem" });
                         }}
-                        className={`p-2 rounded-full backdrop-blur-sm transition-colors ${isBookmarked(gem.id, "gem")
+                        className={`p-2 rounded-full backdrop-blur-sm transition-colors ${isBookmarked?.(gem.id, "gem")
                             ? "bg-red-500 text-white"
                             : "bg-white/20 text-white hover:bg-white/30"
                           }`}
@@ -552,7 +557,7 @@ const HiddenGemsPage = ({ onPageChange, addBookmark, isBookmarked, user }) => {
 
                 <div className="flex flex-wrap justify-center gap-4 mt-8 pt-6 border-t border-gray-200">
                   <button
-                    onClick={() => addBookmark({ ...selectedGem, type: "gem" })}
+                    onClick={() => addBookmark?.({ ...selectedGem, type: "gem" })}
                     className="btn-heritage px-6 py-3 flex items-center space-x-2"
                   >
                     <Heart size={18} />

@@ -1,12 +1,13 @@
 // src/components/GlobalMusicPlayer.jsx
 import React, { useRef, useState, useEffect } from "react";
+import { Volume2, VolumeX } from "lucide-react";
+import { ASSETS } from "../constants/assets";
 
 const GlobalMusicPlayer = () => {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.15); // 30%
+  const [volume] = useState(0.25);
 
-  // keep audio volume in sync
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
@@ -31,34 +32,31 @@ const GlobalMusicPlayer = () => {
     }
   };
 
-  const handleVolumeChange = (e) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-  };
-
   return (
     <>
-      {/* keep this mounted once (e.g. in App.jsx) so music is global */}
       <audio
         ref={audioRef}
-        src="/music-player.mp3"
+        src={ASSETS.GLOBAL_MUSIC || "/music-player.mp3"}
         loop
         preload="auto"
       />
 
-      {/* fixed circular button at bottom-right */}
-      <div className="fixed bottom-6 right-6 z-50 group select-none">
+      {/* Music button on the top right, below header (matches reference UI) */}
+      <div className="fixed top-24 right-6 z-50 select-none">
         <button
           onClick={togglePlay}
-          className="w-14 h-14 rounded-full bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-2xl flex items-center justify-center hover:from-red-700 hover:to-orange-700 transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm"
-          aria-label={isPlaying ? "Pause background music" : "Play background music"}
+          className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 text-white shadow-2xl flex items-center justify-center hover:from-red-700 hover:via-orange-600 hover:to-amber-600 transition-all duration-300 hover:scale-110 border-2 border-white/30 backdrop-blur-md group"
+          aria-label={
+            isPlaying ? "Pause background music" : "Play background music"
+          }
+          title={isPlaying ? "Mute Music" : "Play Ambient Music"}
         >
-          {isPlaying ? "🔊" : "🔈"}
+          {isPlaying ? (
+            <Volume2 size={22} className="text-white drop-shadow animate-pulse" />
+          ) : (
+            <VolumeX size={22} className="text-white drop-shadow opacity-90" />
+          )}
         </button>
-        
       </div>
     </>
   );

@@ -23,9 +23,9 @@ const HeritageDetailPage = ({
   item,
   onPageChange,
   user,
-  addBookmark,
-  removeBookmark,
-  isBookmarked,
+  addBookmark = () => {},
+  removeBookmark = () => {},
+  isBookmarked = () => false,
 }) => {
   const [activeTab, setActiveTab] = useState("overview");
   const [showPanoViewer, setShowPanoViewer] = useState(false);
@@ -33,9 +33,11 @@ const HeritageDetailPage = ({
   const [isBookmarkedLocal, setIsBookmarkedLocal] = useState(false);
 
   useEffect(() => {
-    setIsBookmarkedLocal(isBookmarked(item.id, "heritage"));
+    if (typeof isBookmarked === "function" && item?.id) {
+      setIsBookmarkedLocal(Boolean(isBookmarked(item.id, "heritage")));
+    }
     loadReviews();
-  }, [item.id, isBookmarked]);
+  }, [item?.id, isBookmarked]);
 
   // Simulated reviews fetching - consider replacing with real API call
   const loadReviews = () => {
@@ -70,11 +72,11 @@ const HeritageDetailPage = ({
 
   const handleBookmark = () => {
     if (isBookmarkedLocal) {
-      removeBookmark(item.id, "heritage");
+      removeBookmark?.(item?.id, "heritage");
       setIsBookmarkedLocal(false);
       toast.success("Removed from bookmarks");
     } else {
-      addBookmark({ ...item, type: "heritage" });
+      addBookmark?.({ ...item, type: "heritage" });
       setIsBookmarkedLocal(true);
       toast.success("Added to bookmarks");
     }

@@ -53,6 +53,44 @@ function App() {
   const [currentPage, setCurrentPage] = useState("home");
   const [selectedItem, setSelectedItem] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [bookmarks, setBookmarks] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("bharatverse_bookmarks") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  const addBookmark = (item) => {
+    if (!item?.id) return;
+    setBookmarks((prev) => {
+      const exists = prev.some((b) => b.id === item.id);
+      const updated = exists ? prev.filter((b) => b.id !== item.id) : [...prev, item];
+      try {
+        localStorage.setItem("bharatverse_bookmarks", JSON.stringify(updated));
+      } catch (err) {
+        console.warn("Failed to persist bookmark:", err);
+      }
+      return updated;
+    });
+  };
+
+  const removeBookmark = (id) => {
+    setBookmarks((prev) => {
+      const updated = prev.filter((b) => b.id !== id);
+      try {
+        localStorage.setItem("bharatverse_bookmarks", JSON.stringify(updated));
+      } catch (err) {
+        console.warn("Failed to remove bookmark:", err);
+      }
+      return updated;
+    });
+  };
+
+  const isBookmarked = (id) => {
+    if (!id) return false;
+    return bookmarks.some((b) => b.id === id);
+  };
 
   const { user: clerkUser, isSignedIn, isLoaded } = useUser();
   const { getToken } = useAuth();
@@ -99,6 +137,10 @@ function App() {
       onSearchChange: setSearchQuery,
       onPageChange: handlePageChange,
       selectedItem,
+      bookmarks,
+      addBookmark,
+      removeBookmark,
+      isBookmarked,
     };
 
     switch (currentPage) {
