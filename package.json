@@ -12,7 +12,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.61.3",
     "@google/generative-ai": "^0.24.1",
+    "@gradio/client": "^2.7.2",
     "@supabase/supabase-js": "^2.58.0",
     "@tanstack/react-query": "^5.107.1",
     "axios": "^1.12.2",
