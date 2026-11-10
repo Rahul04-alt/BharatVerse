@@ -37,7 +37,7 @@ import magneticHillImg from "../assets/hidden-gems/magnetic-hill.jpg";
 import rootBridgesImg from "../assets/hidden-gems/root-bridges.jpg";
 import kolukkumalaiImg from "../assets/hidden-gems/kolukkumalai.jpg";
 //video
-import video from "../assets/hgv2.mp4";
+import video from "../assets/home2.mp4";
 
 // Image mapping object
 const imageMap = {
