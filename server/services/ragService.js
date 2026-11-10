@@ -12,7 +12,7 @@ const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
 
 export class CulturalRAGService {
   constructor() {
-    this.modelName = "gemini-2.5-flash";
+    this.modelName = "gemini-flash-latest";
   }
 
   /**
@@ -108,9 +108,9 @@ STRICT GUIDELINES:
         quickActions,
       };
     } catch (err) {
-      console.error("[RAGService] Gemini invocation failed, trying 1.5-flash fallback:", err.message);
+      console.error("[RAGService] Gemini primary invocation failed, trying fallback:", err.message);
       try {
-        const fallbackModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const fallbackModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const result = await fallbackModel.generateContent(`${systemPrompt}\n\nUSER QUESTION: ${userQuery}`);
         return {
           text: result.response.text(),
